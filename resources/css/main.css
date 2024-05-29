@@ -1,0 +1,50 @@
+body {
+    min-width: 650px;
+    min-height: 580px;
+}
+
+.navbar-logo {
+    height: 40px;
+    width: 40px;
+    transition-duration: 1s;
+}
+
+.navbar-logo:hover {
+    transform: rotate(360deg);
+}
+
+.card-round {
+    border-radius: 30px;
+}
+
+.card-shadow {
+    box-shadow: 5px 5px 15px grey;
+}
+
+.btn-light:active:focus {
+    color: black;
+    background-color: #f1a63c;
+}
+
+.btn-light:hover {
+    color: black;
+    background-color: #eecb9a;
+}
+
+.headtitle {
+    font-family: "klavika";
+    font-weight: bold;
+}
+
+.normal_font {
+    font-family: "klavika";
+    font-weight: 300;
+    font-style: normal;
+}
+
+.mini_profile_pic {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
