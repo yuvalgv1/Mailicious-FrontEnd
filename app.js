@@ -1,21 +1,25 @@
-require('dotenv').config({ path: './config/.env' });
-const path = require('path');
+require("dotenv").config({ path: "./config/.env" });
+const path = require("path");
+const cookieParser = require('cookie-parser');
 
 const express = require("express");
 const app = express();
 
 // create session for the app
-const session = require('express-session');
-app.use(session({
-    secret: 'Mailicious',
-    saveUninitialized: false,
-    resave: false
-}))
+const session = require("express-session");
+app.use(
+    session({
+        secret: "Mailicious",
+        saveUninitialized: false,
+        resave: false,
+    })
+);
+app.use(cookieParser());
 
 app.use(express.static("resources"));
 // Set the views folder
-const { readdirSync, statSync } = require('fs');
-views = []
+const { readdirSync, statSync } = require("fs");
+views = [];
 function exploreViews(currentPath) {
     // get all files under views
     const files = readdirSync(currentPath);
@@ -32,10 +36,11 @@ function exploreViews(currentPath) {
         }
     });
 }
-views_path = __dirname + "\\views"
+views_path = __dirname + "\\views";
 views.push(views_path);
 exploreViews(views_path);
 app.set("views", views);
+app.set("view engine", "ejs");
 
 // Route the requests
 app.use(express.urlencoded({ extended: false }));
