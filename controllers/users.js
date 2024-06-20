@@ -59,7 +59,7 @@ async function isLoggedIn(req, res, next) {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Authorization": `${token}`
             }
         });
 
@@ -80,7 +80,7 @@ async function isLoggedIn(req, res, next) {
                     window.location.href = '/login';
                 </script>
             `);
-            } else return res.redirect("/login");
+            } else next();
         }
     } catch (error) {
         return res.status(500).json({ error: "Internal Server Error" });
