@@ -33,6 +33,8 @@ $("form").on("submit", function (event) {
         success: function (res) {
             path = sessionStorage.getItem("redirect_path");
             sessionStorage.removeItem("redirect_path");
+            console.log(res.id)
+            sessionStorage.setItem("userId", res.id);
             if (path) {
                 window.location.href = path;
             } else {

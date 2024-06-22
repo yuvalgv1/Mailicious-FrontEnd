@@ -14,7 +14,6 @@ async function login(req, res) {
             .status(400)
             .json({ error: "Username and password are required" });
     }
-
     try {
         const response = await fetch(`${process.env.BACKEND_URL}/login`, {
             method: req.method,
@@ -28,7 +27,7 @@ async function login(req, res) {
 
         if (response.ok) {
             // Set the token as a secure cookie
-            const token = data.token;
+            const { token, id } = data;
             res.cookie("authToken", token, {
                 httpOnly: true, // Prevents JavaScript access
                 //secure: true,      // Ensures the cookie is only sent over HTTPS. For now we don't have HTTPS
@@ -37,7 +36,7 @@ async function login(req, res) {
             });
             return res
                 .status(response.status)
-                .json({ message: "Login successful" });
+                .json({ id, message: "Login successful"});
         } else {
             // Invalid login credentials
             return res.status(response.status).json(data);
