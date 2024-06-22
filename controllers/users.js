@@ -1,3 +1,5 @@
+const { response } = require("express");
+
 require("dotenv").config({ path: "../config/.env" });
 
 // Render the login form
@@ -36,7 +38,7 @@ async function login(req, res) {
             });
             return res
                 .status(response.status)
-                .json({ id, message: "Login successful"});
+                .json({ id, message: "Login successful" });
         } else {
             // Invalid login credentials
             return res.status(response.status).json(data);
@@ -58,13 +60,11 @@ async function isLoggedIn(req, res, next) {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `${token}`
-            }
+                Authorization: `Bearer ${token}`,
+            },
         });
 
         if (response.ok) {
-            // Add the
-
             // Skip the login page if there's an active token
             if (requested_path === "/login") {
                 return res.redirect("/");
@@ -98,10 +98,31 @@ function logout(req, res) {
     });
 }
 
+// Get user data
+async function users(req, res) {
+    try {
+        // Get user's details using its id
+        const {id} = req.query
+        const token = req.cookies.authToken;
+        const response = await fetch(`${process.env.BACKEND_URL}/users?id=${id}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
 module.exports = {
     loginForm,
     login,
     isLoggedIn,
     home,
     logout,
+    users,
 };
