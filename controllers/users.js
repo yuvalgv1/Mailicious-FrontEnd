@@ -33,7 +33,7 @@ async function login(req, res) {
                 httpOnly: true, // Prevents JavaScript access
                 //secure: true,      // Ensures the cookie is only sent over HTTPS. For now we don't have HTTPS
                 sameSite: "Strict", // Mitigates CSRF attacks
-                maxAge: 24 * 60 * 60 * 1000, // Cookie expires in a day
+                maxAge: 12 * 60 * 60 * 1000, // Cookie expires in 12 hours
             });
             return res
                 .status(response.status)

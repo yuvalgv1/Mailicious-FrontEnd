@@ -1,56 +1,38 @@
 body {
     min-width: 650px;
     min-height: 580px;
+    font-family: "klavika";
 }
 
-.navbar-logo {
+#sidebar-navbar {
+    width: 60px;
+    transition: width 0.3s;
+}
+
+#sidebar-nabar.expanded {
+    width: 200px;
+}
+
+header {
+    transition: width 0.3s;
+}
+
+.header-logo {
     height: 40px;
     width: 40px;
     transition-duration: 1s;
 }
 
-.navbar-logo:hover {
+.header-logo:hover {
     transform: rotate(360deg);
 }
 
-.card-round {
-    border-radius: 30px;
+.main-content {
+    margin-left: 60px; /* Account for the width of the navbar */
+    transition: margin-left 0.3s, width 0.3s;
 }
 
-.card-shadow {
-    box-shadow: 5px 5px 15px grey;
-}
-
-.btn-light {
-    background-color: #ffffff;
-    color: #000000;
-}
-
-.btn-light:focus,
-.btn-light:active:focus {
-    background-color: #f1a63c;
-    color: #000000;
-}
-
-.btn-light:hover {
-    color: black;
-    background-color: #eecb9a;
-}
-
-.headtitle {
-    font-family: "klavika";
-    font-weight: bold;
-}
-
-.normal_font {
-    font-family: "klavika";
-    font-weight: 300;
-    font-style: normal;
-}
-
-.mini_profile_pic {
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    border: 1px solid black;
+.navbar.expanded ~ .main-content {
+    margin-left: 200px; /* Account for the expanded width of the navbar */
+    width: calc(100% - 200px); /* Fill the remaining width when expanded */
 }

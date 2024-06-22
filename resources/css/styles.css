@@ -1,0 +1,52 @@
+body {
+    margin: 0;
+    font-family: 'klavika';
+}
+
+.navbar {
+    width: 60px;
+    transition: width 0.3s;
+}
+
+.navbar.expanded {
+    width: 200px;
+}
+
+.menu-btn {
+    font-size: 24px;
+}
+
+.nav-btn {
+    font-size: 24px;
+    color: black;
+}
+
+.nav-text {
+    display: none;
+}
+
+.navbar.expanded .nav-text {
+    display: inline-block;
+}
+
+.logo {
+    height: 40px;
+}
+
+.app-name {
+    font-size: 24px;
+}
+
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.profile-name {
+    font-weight: bold;
+}
+
+.profile-role {
+    font-size: 12px;
+}
