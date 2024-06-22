@@ -1,3 +1,8 @@
+:root {
+    --navbar_width: 60px;
+    --navbar_expanded_width: 200px;
+}
+
 body {
     min-width: 650px;
     min-height: 580px;
@@ -5,16 +10,17 @@ body {
 }
 
 #sidebar-navbar {
-    width: 60px;
-    transition: width 0.3s;
+    width: var(--navbar_width);
+    transition: margin-left 0.3s, width 0.3s;
+    z-index: 10;
 }
 
-#sidebar-nabar.expanded {
-    width: 200px;
+#sidebar-navbar.expanded {
+    width: var(--navbar_expanded_width);
 }
 
 header {
-    transition: width 0.3s;
+    transition: margin-left 0.3s, width 0.3s;
 }
 
 .header-logo {
@@ -28,11 +34,36 @@ header {
 }
 
 .main-content {
-    margin-left: 60px; /* Account for the width of the navbar */
+    margin-left: var(--navbar_width);
+    width: calc(100% - var(--navbar_width));
     transition: margin-left 0.3s, width 0.3s;
+    z-index: 1;
 }
 
 .navbar.expanded ~ .main-content {
-    margin-left: 200px; /* Account for the expanded width of the navbar */
-    width: calc(100% - 200px); /* Fill the remaining width when expanded */
+    margin-left: var(--navbar_expanded_width); /* Account for the expanded width of the navbar */
+    width: calc(100% - var(--navbar_expanded_width)); /* Fill the remaining width when expanded */
+}
+
+.nav-btn {
+    font-size: 24px;
+    color: black;
+}
+
+.app-name {
+    font-size: 24px;
+}
+
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.profile-name {
+    font-weight: bold;
+}
+
+.profile-role {
+    font-size: 12px;
 }

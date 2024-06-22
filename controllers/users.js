@@ -2,7 +2,7 @@ require("dotenv").config({ path: "../config/.env" });
 
 // Render the login form
 function loginForm(req, res) {
-    res.render("login", {});
+    res.render("login", { layout: false });
 }
 
 // Handle user login
@@ -88,7 +88,7 @@ async function isLoggedIn(req, res, next) {
 
 // Render the home page
 function home(req, res) {
-    res.render("home", { username: req.session.username });
+    res.render("home");
 }
 
 // Handle user logout

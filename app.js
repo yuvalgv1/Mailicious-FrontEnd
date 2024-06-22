@@ -3,6 +3,7 @@ const path = require("path");
 const cookieParser = require('cookie-parser');
 
 const express = require("express");
+const expressLayouts = require('express-ejs-layouts');
 const app = express();
 
 // create session for the app
@@ -41,6 +42,7 @@ views.push(views_path);
 exploreViews(views_path);
 app.set("views", views);
 app.set("view engine", "ejs");
+app.use(expressLayouts);
 
 // Route the requests
 app.use(express.urlencoded({ extended: false }));
