@@ -1,11 +1,4 @@
-const { response } = require("express");
-
 require("dotenv").config({ path: "../config/.env" });
-
-// Render the login form
-function loginForm(req, res) {
-    res.render("login", { layout: false });
-}
 
 // Handle user login
 async function login(req, res) {
@@ -86,11 +79,6 @@ async function isLoggedIn(req, res, next) {
     }
 }
 
-// Render the home page
-function home(req, res) {
-    res.render("home");
-}
-
 // Handle user logout
 function logout(req, res) {
     req.session.destroy(() => {
@@ -119,10 +107,8 @@ async function users(req, res) {
 }
 
 module.exports = {
-    loginForm,
     login,
     isLoggedIn,
-    home,
     logout,
     users,
 };

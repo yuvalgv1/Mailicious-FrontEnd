@@ -54,16 +54,6 @@ header {
     font-size: 24px;
 }
 
-.profile-picture {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-
 .profile-name {
     font-weight: bold;
-}
-
-.profile-role {
-    font-size: 12px;
 }

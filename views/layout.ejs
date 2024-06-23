@@ -22,31 +22,64 @@
                 id="sidebar-navbar"
                 class="d-flex navbar navbar-expand-lg flex-column bg-primary vh-100 position-fixed"
             >
-                <button class="btn btn-primary menu-btn">
+                <button
+                    title="Menu"
+                    class="btn btn-primary menu-btn"
+                >
                     <i class="fas fa-bars text-white"></i>
                 </button>
-                <div class="nav-buttons flex-column mt-3 me-auto">
-                    <button class="btn nav-btn d-flex align-items-center mb-2">
+                <div class="nav-buttons flex-column mt-3">
+                    <button
+                        id="home"
+                        title="Home"
+                        data-title="Home"
+                        data-path="/home"
+                        class="btn nav-btn d-flex align-items-center mb-2"
+                    >
                         <i class="fas fa-home"></i>
                         <span class="nav-text ml-2 d-none mx-2">Home</span>
                     </button>
-                    <button class="btn nav-btn d-flex align-items-center mb-2">
+                    <button
+                        id="search"
+                        title="Data Search"
+                        data-title="Data Search"
+                        data-path="/search"
+                        class="btn nav-btn d-flex align-items-center mb-2"
+                    >
                         <i class="fas fa-search"></i>
                         <span class="nav-text ml-2 d-none mx-2"
                             >Data Search</span
                         >
                     </button>
-                    <button class="btn nav-btn d-flex align-items-center mb-2">
-                        <i class="fas fa-flag"></i>
-                        <span class="nav-text ml-2 d-none mx-2">Alerts</span>
-                    </button>
-                    <button class="btn nav-btn d-flex align-items-center mb-2">
+                    <button
+                        id="rules"
+                        title="Rules"
+                        data-title="Rules"
+                        data-path="/rules"
+                        class="btn nav-btn d-flex align-items-center mb-2"
+                    >
                         <i class="fas fa-wrench"></i>
                         <span class="nav-text ml-2 d-none mx-2">Rules</span>
                     </button>
+                    <button
+                        id="alerts"
+                        title="Alerts"
+                        data-title="Alerts"
+                        data-path="/alerts"
+                        class="btn nav-btn d-flex align-items-center mb-2"
+                    >
+                        <i class="fas fa-flag"></i>
+                        <span class="nav-text ml-2 d-none mx-2">Alerts</span>
+                    </button>
                 </div>
-                <div class="settings-btn-container mt-auto me-auto px-0 py-2">
-                    <button class="btn nav-btn d-flex align-items-center">
+                <div class="settings-btn-container mt-auto py-2">
+                    <button
+                        id="settings"
+                        title="Settings"
+                        data-title="Settings"
+                        data-path="/settings"
+                        class="btn nav-btn d-flex align-items-center"
+                    >
                         <i class="fas fa-cog"></i>
                         <span class="nav-text ml-2 d-none mx-2">Settings</span>
                     </button>
@@ -59,9 +92,9 @@
                     </a>
                     <span class="app-name h3 my-1">Mailicious</span>
                     <div class="profile ms-auto d-flex align-items-center mx-4">
-                        <span class="profile-name font-weight-bold d-block"
-                            ></span
-                        >
+                        <span
+                            class="profile-name font-weight-bold d-block"
+                        ></span>
                     </div>
                 </header>
                 <div class="content p-4"><%- body %></div>
