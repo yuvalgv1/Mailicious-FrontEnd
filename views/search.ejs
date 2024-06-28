@@ -1,4 +1,4 @@
-<div id="top">
+<div id="top" class="container">
     <div id="quick_search_side" class="col-4">
         <div class="page-name h4">Data Search</div>
         <div
@@ -15,5 +15,15 @@
     </div>
 </div>
 <div id="table-area">
+    <div id="error_message" class="text-danger"></div>
+    <div id="loading-message"></div>
+    <div class="container">
+        <div class="table-responsive">
+            <table
+                id="emails_table"
+                class="table table-hover table-striped table-info"
+            ></table>
+        </div>
+    </div>
     <script src="/scripts/search.js"></script>
 </div>

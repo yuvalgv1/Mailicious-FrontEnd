@@ -4,7 +4,6 @@ require("dotenv").config({ path: "../config/.env" });
 // Retreive data from emails using query
 async function search(req, res) {
     try {
-        console.log(req)
         const query = req.body.query;
         const response = await fetch(`${process.env.BACKEND_URL}/emails`, {
             method: "POST",
