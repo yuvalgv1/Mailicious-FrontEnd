@@ -41,8 +41,12 @@ header {
 }
 
 .navbar.expanded ~ .main-content {
-    margin-left: var(--navbar_expanded_width); /* Account for the expanded width of the navbar */
-    width: calc(100% - var(--navbar_expanded_width)); /* Fill the remaining width when expanded */
+    margin-left: var(
+        --navbar_expanded_width
+    ); /* Account for the expanded width of the navbar */
+    width: calc(
+        100% - var(--navbar_expanded_width)
+    ); /* Fill the remaining width when expanded */
 }
 
 .nav-btn {
@@ -50,10 +54,14 @@ header {
     color: black;
 }
 
-.app-name {
-    font-size: 24px;
-}
-
 .profile-name {
     font-weight: bold;
+}
+
+.page-name {
+    font-weight: bold;
+}
+
+.search-input {
+    outline: none;
 }

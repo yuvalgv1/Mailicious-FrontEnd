@@ -1,6 +1,7 @@
 require("dotenv").config({ path: "./config/.env" });
 const path = require("path");
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 const express = require("express");
 const expressLayouts = require('express-ejs-layouts');
@@ -16,6 +17,7 @@ app.use(
     })
 );
 app.use(cookieParser());
+app.use(bodyParser.json());
 
 app.use(express.static("resources"));
 // Set the views folder
