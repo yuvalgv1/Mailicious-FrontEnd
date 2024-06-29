@@ -1,6 +1,9 @@
 $(document).ready(function () {
+    let statement = "SELECT * FROM emails";
     let fields = [];
+    let filters = Map();
 
+    // Add loading message when waiting for the server to send the data.
     function loadData() {
         $("#loading-message")
             .append(" Loading Data...")
@@ -12,16 +15,15 @@ $(document).ready(function () {
             );
     }
 
+    // Remoev the loading Data text
     function removeLoading() {
         $("#loading-message").html("");
     }
 
-    function sendSQLStatement() {
+    // Send to the server a request for a new query
+    function sendStatement() {
         $("#emails_table").text();
         loadData();
-        let statement = "";
-        if (fields.length === 0) statement = `SELECT * FROM emails`;
-        else statement = `SELECT ${fields.join(",")} FROM emails`;
         $.ajax({
             url: "/search",
             type: "POST",
@@ -29,7 +31,7 @@ $(document).ready(function () {
             data: JSON.stringify({ query: statement }),
             success: function (response) {
                 $("#error_message").text();
-                setFields(response);
+                if (fields.length === 0) setFields(response);
                 buildTable(response);
             },
             error: function (res) {
@@ -41,6 +43,7 @@ $(document).ready(function () {
         });
     }
 
+    // Convert the fields from the server
     function setFields(jsonData) {
         let keysMap = new Map();
 
@@ -94,5 +97,5 @@ $(document).ready(function () {
         removeLoading();
     }
 
-    sendSQLStatement();
+    sendStatement();
 });
