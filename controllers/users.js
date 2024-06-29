@@ -25,8 +25,7 @@ async function login(req, res) {
             // Set the token as a secure cookie
             const { access_token , id } = data;
             res.cookie("access_token", access_token, {
-                httpOnly: true, // Prevents JavaScript access
-                //secure: true,      // Ensures the cookie is only sent over HTTPS. For now we don't have HTTPS
+                httpOnly: false, // Allow JavaScript access
                 sameSite: "Strict", // Mitigates CSRF attacks
                 maxAge: 12 * 60 * 60 * 1000, // Cookie expires in 12 hours
             });
