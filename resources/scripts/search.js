@@ -1,7 +1,7 @@
 $(document).ready(function () {
-    let statement = "SELECT * FROM emails";
     let fields = [];
-    let filters = Map();
+    let url = "/search/email";
+    let data = JSON.stringify({});
 
     // Add loading message when waiting for the server to send the data.
     function loadData() {
@@ -20,25 +20,41 @@ $(document).ready(function () {
         $("#loading-message").html("");
     }
 
+    $('#search-input').keypress(function(event) {
+        if (event.which === 13 && $(this).val() != "") {
+            url = "/search/text";
+            data = JSON.stringify({ text: $(this).val()})
+            searchData();
+        }
+        else if ($(this).val() == "" && url == "/search/text") {
+            url = "/search/email";
+            data = JSON.stringify({})
+            searchData();
+        }
+    });
+
     // Send to the server a request for a new query
-    function sendStatement() {
-        $("#emails_table").text();
+    function searchData() {
+        $("#emails_table").text("");
         loadData();
         $.ajax({
-            url: "/search",
+            url: url,
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({ query: statement }),
+            data: data,
             success: function (response) {
-                $("#error_message").text();
+                $("#error_message").text("");
                 if (fields.length === 0) setFields(response);
                 buildTable(response);
             },
             error: function (res) {
+                if (res.status == 401)
+                    window.location.href = "/login";
                 if (res.responseJSON && res.responseJSON.error) {
                     $("#error_message").text(res.responseJSON.error);
                     $("#error_message").addClass("");
                 }
+                removeLoading();
             },
         });
     }
@@ -97,5 +113,5 @@ $(document).ready(function () {
         removeLoading();
     }
 
-    sendStatement();
+    searchData();
 });

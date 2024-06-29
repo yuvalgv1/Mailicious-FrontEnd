@@ -11,8 +11,8 @@ async function login(req, res) {
             .json({ error: "Username and password are required" });
     }
     try {
-        const response = await fetch(`${process.env.BACKEND_URL}/login`, {
-            method: req.method,
+        const response = await fetch(`${process.env.BACKEND_URL}/token`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -23,10 +23,9 @@ async function login(req, res) {
 
         if (response.ok) {
             // Set the token as a secure cookie
-            const { token, id } = data;
-            res.cookie("authToken", token, {
-                httpOnly: true, // Prevents JavaScript access
-                //secure: true,      // Ensures the cookie is only sent over HTTPS. For now we don't have HTTPS
+            const { access_token , id } = data;
+            res.cookie("access_token", access_token, {
+                httpOnly: false, // Allow JavaScript access
                 sameSite: "Strict", // Mitigates CSRF attacks
                 maxAge: 12 * 60 * 60 * 1000, // Cookie expires in 12 hours
             });
@@ -45,18 +44,21 @@ async function login(req, res) {
 // Check if the user is logged in and navigate accordingly
 async function isLoggedIn(req, res, next) {
     // Get the token from cookies
-    const token = req.cookies.authToken;
+    const token = req.cookies.access_token;
     const requested_path = req.originalUrl;
 
     try {
         // Check the validity of the token
-        const response = await fetch(`${process.env.BACKEND_URL}/token`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await fetch(
+            `${process.env.BACKEND_URL}/validate-token`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
 
         if (response.ok) {
             // Skip the login page if there's an active token
@@ -80,32 +82,6 @@ async function isLoggedIn(req, res, next) {
     }
 }
 
-// Check if the token is valid and return error if not
-async function validateAction(req, res, next) {
-    // Get the token from cookies
-    const token = req.cookies.authToken;
-
-    try {
-        // Check the validity of the token
-        const response = await fetch(`${process.env.BACKEND_URL}/token`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        if (response.ok) {
-            // Forward to the requested page
-            return next();
-        } else {
-            return res.status(401).json({ error: "Invalid Token" });
-        }
-    } catch (error) {
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
-}
-
 // Handle user logout
 function logout(req, res) {
     req.session.destroy(() => {
@@ -114,13 +90,13 @@ function logout(req, res) {
 }
 
 // Get user data
-async function users(req, res) {
+async function user(req, res) {
     try {
         // Get user's details using its id
         const { id } = req.query;
-        const token = req.cookies.authToken;
+        const token = req.cookies.access_token;
         const response = await fetch(
-            `${process.env.BACKEND_URL}/users?id=${id}`,
+            `${process.env.BACKEND_URL}/user?id=${id}`,
             {
                 method: "GET",
                 headers: {
@@ -139,7 +115,6 @@ async function users(req, res) {
 module.exports = {
     login,
     isLoggedIn,
-    validateAction,
     logout,
-    users,
+    user,
 };

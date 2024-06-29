@@ -56,6 +56,13 @@ header {
 
 .profile-name {
     font-weight: bold;
+    font-size: 18px;
+    color: black;
+}
+
+#logout {
+    font-size: 24px;
+    color: black;
 }
 
 .page-name {

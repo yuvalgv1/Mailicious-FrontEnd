@@ -6,6 +6,7 @@
         >
             <i class="fas fa-search mx-1 text-body"></i>
             <input
+                id="search-input"
                 name="quickSearch"
                 type="text"
                 class="search-input vw-100 border border-0"
@@ -14,16 +15,14 @@
         </div>
     </div>
 </div>
-<div id="table-area">
+<div id="table-area" class="container">
     <div id="error_message" class="text-danger"></div>
     <div id="loading-message"></div>
-    <div class="container">
-        <div class="table-responsive">
-            <table
-                id="emails_table"
-                class="table table-hover table-striped table-info"
-            ></table>
-        </div>
+    <div class="table-responsive">
+        <table
+            id="emails_table"
+            class="table table-hover table-striped table-info"
+        ></table>
     </div>
     <script src="/scripts/search.js"></script>
 </div>
