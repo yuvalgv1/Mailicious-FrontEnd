@@ -12,7 +12,7 @@ async function login(req, res) {
     }
     try {
         const response = await fetch(`${process.env.BACKEND_URL}/token`, {
-            method: req.method,
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -23,8 +23,8 @@ async function login(req, res) {
 
         if (response.ok) {
             // Set the token as a secure cookie
-            const { token, id } = data;
-            res.cookie("authToken", token, {
+            const { access_token , id } = data;
+            res.cookie("access_token", access_token, {
                 httpOnly: true, // Prevents JavaScript access
                 //secure: true,      // Ensures the cookie is only sent over HTTPS. For now we don't have HTTPS
                 sameSite: "Strict", // Mitigates CSRF attacks
@@ -45,18 +45,21 @@ async function login(req, res) {
 // Check if the user is logged in and navigate accordingly
 async function isLoggedIn(req, res, next) {
     // Get the token from cookies
-    const token = req.cookies.authToken;
+    const token = req.cookies.access_token;
     const requested_path = req.originalUrl;
 
     try {
         // Check the validity of the token
-        const response = await fetch(`${process.env.BACKEND_URL}/validate-token`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await fetch(
+            `${process.env.BACKEND_URL}/validate-token`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
 
         if (response.ok) {
             // Skip the login page if there's an active token
@@ -92,7 +95,7 @@ async function user(req, res) {
     try {
         // Get user's details using its id
         const { id } = req.query;
-        const token = req.cookies.authToken;
+        const token = req.cookies.access_token;
         const response = await fetch(
             `${process.env.BACKEND_URL}/user?id=${id}`,
             {

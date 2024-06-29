@@ -4,7 +4,7 @@ require("dotenv").config({ path: "../config/.env" });
 // Retreive data from emails using query
 async function searchText(req, res) {
     // Get the token from cookies
-    const token = req.cookies.authToken;
+    const token = req.cookies.access_token;
     try {
         const text = req.body.text;
         const response = await fetch(`${process.env.BACKEND_URL}/search/text`, {
@@ -26,7 +26,7 @@ async function searchText(req, res) {
 
 async function searchEmail(req, res) {
     // Get the token from cookies
-    const token = req.cookies.authToken;
+    const token = req.cookies.access_token;
     try {
         const response = await fetch(`${process.env.BACKEND_URL}/search/email`, {
             method: "POST",
