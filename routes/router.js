@@ -9,7 +9,7 @@ const actionsontroller = require("../controllers/actions");
 // User controller
 router.post("/login", usersController.login);
 router.get("/logout", usersController.logout);
-router.get("/users", usersController.isLoggedIn, usersController.users);
+router.get("/user", usersController.user);
 
 // Navigation Controller
 router.get("/", usersController.isLoggedIn, pagesController.home);
@@ -21,6 +21,7 @@ router.get("/alerts", usersController.isLoggedIn, pagesController.alerts);
 router.get("/settings", usersController.isLoggedIn, pagesController.settings);
 
 // Actions Controller
-router.post("/search", usersController.validateAction, actionsontroller.search);
+router.post("/search/text", actionsontroller.searchText);
+router.post("/search/email", actionsontroller.searchEmail);
 
 module.exports = router;

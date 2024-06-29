@@ -1,7 +1,7 @@
 $(document).ready(function () {
-    let statement = "SELECT * FROM emails";
     let fields = [];
-    let filters = Map();
+    let url = "/search/email";
+    let data = JSON.stringify({});
 
     // Add loading message when waiting for the server to send the data.
     function loadData() {
@@ -21,14 +21,14 @@ $(document).ready(function () {
     }
 
     // Send to the server a request for a new query
-    function sendStatement() {
+    function searchData() {
         $("#emails_table").text();
         loadData();
         $.ajax({
-            url: "/search",
+            url: url,
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({ query: statement }),
+            data: data,
             success: function (response) {
                 $("#error_message").text();
                 if (fields.length === 0) setFields(response);
@@ -39,6 +39,7 @@ $(document).ready(function () {
                     $("#error_message").text(res.responseJSON.error);
                     $("#error_message").addClass("");
                 }
+                removeLoading();
             },
         });
     }
@@ -97,5 +98,5 @@ $(document).ready(function () {
         removeLoading();
     }
 
-    sendStatement();
+    searchData();
 });

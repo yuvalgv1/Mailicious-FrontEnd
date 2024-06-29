@@ -27,7 +27,7 @@ $(document).ready(function () {
 
     // Get the user name
     $.ajax({
-        url: "/users",
+        url: "/user",
         type: "GET",
         dataType: "json",
         data: { id: localStorage.getItem("userId") },
@@ -35,6 +35,8 @@ $(document).ready(function () {
             $(".profile-name").text(res.full_name);
         },
         error: function (res) {
+            if (res.status == 401)
+                window.location.href = "/login";
             $(".profile-name").text("");
         },
     });
