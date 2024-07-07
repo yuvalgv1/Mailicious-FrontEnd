@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/css/search.css" />
 <div id="top" class="container">
     <div id="quick_search_side" class="col-4">
         <div class="page-name h4">Data Search</div>
@@ -12,6 +13,27 @@
                 class="search-input vw-100 border border-0"
                 placeholder="Quick Search"
             />
+        </div>
+    </div>
+    <button
+        id="customize-table"
+        class="bg-info rounded-circle border border-0 position-absolute" title="Customize Table"
+    >
+        +
+    </button>
+    <div id="popup" class="popup rounded">
+        <div class="popup-header">
+            <span>Customize Table</span>
+            <button id="close-popup" class="close-popup">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p>Select and Reorder Columns:</p>
+                <ul id="sortable-columns" class="list-group">
+                    <ul id="sortable-columns" class="list-group">
+                        <!-- Columns will be dynamically added here -->
+                    </ul>
+                </ul>
+                <button id="apply-changes" class="btn btn-primary mt-3">Apply Changes</button>
         </div>
     </div>
 </div>

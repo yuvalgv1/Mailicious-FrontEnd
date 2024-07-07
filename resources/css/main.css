@@ -21,6 +21,8 @@ body {
 
 header {
     transition: margin-left 0.3s, width 0.3s;
+    position: absolute;
+    z-index: 100;
 }
 
 .header-logo {
@@ -67,8 +69,4 @@ header {
 
 .page-name {
     font-weight: bold;
-}
-
-.search-input {
-    outline: none;
 }

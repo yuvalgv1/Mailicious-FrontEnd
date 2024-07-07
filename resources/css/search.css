@@ -1,0 +1,70 @@
+.search-input {
+    outline: none;
+}
+
+#top {
+    position: relative;
+}
+
+#customize-table {
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    z-index: 1050;
+}
+
+.popup {
+    display: none; /* Initially hidden */
+    position: absolute;
+    top: calc(50% + 60px);
+    right: 80px; /* Position it next to the button */
+    transform: translateY(-50%);
+    width: 250px; /* Set the width of the popup */
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1060; /* Ensure the popup is above other elements */
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.close-popup {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.popup-content {
+    max-height: 200px;
+    overflow-y: auto; /* Add scrolling if the content exceeds max height */
+}
+
+#sortable-columns {
+    padding-left: 0;
+}
+
+#sortable-columns li {
+    cursor: move;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sortable-placeholder {
+    background-color: #f0f0f0;
+    border: 1px dashed #ddd;
+    height: 2em;
+    margin-bottom: 10px;
+}
+
+.checkbox-column {
+    margin-right: 10px;
+}
