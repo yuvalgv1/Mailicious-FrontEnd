@@ -129,7 +129,7 @@ $(document).ready(function () {
                         .prop("checked", visibleFields.has(field))
                         .change(function () {
                             // Update the temporary array based on current checkbox states
-                            newVisibleFields = [];
+                            let newVisibleFields = [];
                             sortableList
                                 .find(".checkbox-column")
                                 .each(function () {
