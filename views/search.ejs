@@ -17,9 +17,10 @@
     </div>
     <button
         id="customize-table"
-        class="bg-info rounded-circle border border-0 position-absolute" title="Customize Table"
+        class="bg-info rounded-circle border border-0 position-absolute"
+        title="Customize Table"
     >
-        +
+        <i class="fas fa-edit"></i>
     </button>
     <div id="popup" class="popup rounded">
         <div class="popup-header">
@@ -28,12 +29,14 @@
         </div>
         <div class="popup-content">
             <p>Select and Reorder Columns:</p>
+            <ul id="sortable-columns" class="list-group">
                 <ul id="sortable-columns" class="list-group">
-                    <ul id="sortable-columns" class="list-group">
-                        <!-- Columns will be dynamically added here -->
-                    </ul>
+                    <!-- Columns will be dynamically added here -->
                 </ul>
-                <button id="apply-changes" class="btn btn-primary mt-3">Apply Changes</button>
+            </ul>
+            <button id="apply-changes" class="btn btn-primary mt-3">
+                Apply Changes
+            </button>
         </div>
     </div>
 </div>

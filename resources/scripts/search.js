@@ -5,6 +5,10 @@ $(document).ready(function () {
     let send_data = JSON.stringify({});
     let table_data = "";
 
+    // Variables to track current sort field and order
+    let currentSortField = null;
+    let currentSortOrder = null;
+
     // Add loading message when waiting for the server to send the data.
     function loadData() {
         $("#loading-message")
@@ -36,7 +40,7 @@ $(document).ready(function () {
 
     // Send to the server a request for a new query
     function searchData() {
-        $("#emails_table").text("");
+        $("#emails_table").empty();
         loadData();
         $.ajax({
             url: url,
@@ -80,22 +84,69 @@ $(document).ready(function () {
     function buildTable() {
         // Enter the data from the table
         $table = $("#emails_table");
+        $table.empty();
 
         // Add headers for the table
-        $table.append(
-            $("<thead/>").append(
-                $("<tr/>", {
-                    id: "table-head-row",
-                })
-            )
-        );
+        let $thead = $("<thead/>").appendTo($table);
+        let $headerRow = $("<tr/>", {
+            id: "table-head-row",
+        }).appendTo($thead);
+
         visibleFields.forEach((field) => {
-            $("#table-head-row").append(
-                $("<th/>", {
-                    scope: "col",
-                    text: field,
-                })
-            );
+            let $th = $("<th/>", {
+                scope: "col",
+            }).appendTo($headerRow);
+
+            // Create a flex container for text and sorting button
+            let $headerContent = $("<div/>", {
+                class: "d-flex justify-content-between align-items-center",
+            }).appendTo($th);
+
+            // Add field text
+            $("<span/>", {
+                text: field,
+            }).appendTo($headerContent);
+
+            // Add sorting button
+            let $sortButton = $("<button/>", {
+                type: "button",
+                class: "btn btn-sm sort-button",
+                "data-field": field,
+                "data-sort": "asc", // Initial sort state
+            })
+                .html('<i class="fas fa-sort"></i>')
+                .appendTo($headerContent);
+
+            // Check if this is the currently sorted field
+            if (field === currentSortField) {
+                $sortButton.attr("data-sort", currentSortOrder);
+                $sortButton.html(
+                    `<i class="fas fa-sort-${
+                        currentSortOrder === "asc" ? "up" : "down"
+                    }"></i>`
+                );
+            } else {
+                $sortButton.attr("data-sort", "asc"); // Default sort order
+            }
+
+            $sortButton.click(function () {
+                let $this = $(this);
+                let field = $this.attr("data-field");
+                let currentSort = $this.attr("data-sort");
+                let newSort = currentSort === "asc" ? "desc" : "asc";
+
+                // Update sort indicator
+                $(".sort-button").html('<i class="fas fa-sort"></i>');
+                $this.html(
+                    `<i class="fas fa-sort-${
+                        newSort === "asc" ? "up" : "down"
+                    }"></i>`
+                );
+                $this.attr("data-sort", newSort);
+
+                // Sort table
+                sortTable(field, newSort);
+            });
         });
 
         // Add data
@@ -178,10 +229,44 @@ $(document).ready(function () {
 
     // Apply changes to table
     $("#apply-changes").click(function () {
-        $("#emails_table").text("");
         buildTable();
         $("#popup").hide();
     });
+
+    // Function to sort the table
+    function sortTable(field, order) {
+        console.log(order);
+        table_data.sort((a, b) => {
+            let aValue = a[field];
+            let bValue = b[field];
+
+            // Handle empty cells: Treat them as the highest value
+            if (order == "desc") {
+                if (!aValue) return -1; // Empty cells go first
+                if (!bValue) return 1; // Empty cells go first
+            } else {
+                if (!aValue) return 1; // Empty cells go last
+                if (!bValue) return -1; // Empty cells go last
+            }
+
+            // Case insensitivity: Convert to lower or upper case for comparison
+            aValue = aValue.toString().toLowerCase();
+            bValue = bValue.toString().toLowerCase();
+
+            if (order === "desc") {
+                return bValue.localeCompare(aValue);
+            } else {
+                return aValue.localeCompare(bValue);
+            }
+        });
+
+        // Update current sort field and order
+        currentSortField = field;
+        currentSortOrder = order;
+
+        // Rebuild table with sorted data
+        buildTable();
+    }
 
     searchData();
 });
