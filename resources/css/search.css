@@ -68,3 +68,16 @@
 .checkbox-column {
     margin-right: 10px;
 }
+
+th {
+    position: relative;
+}
+.sort-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+.sort-button i {
+    margin-left: 5px;
+}
