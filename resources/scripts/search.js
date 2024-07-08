@@ -233,9 +233,13 @@ $(document).ready(function () {
         $("#popup").hide();
     });
 
+    // Helper function to check if a value is a valid Date
+    function isDate(value) {
+        return new Date(value) !== "Invalid Date" && !isNaN(new Date(value));
+    };
+
     // Function to sort the table
     function sortTable(field, order) {
-        console.log(order);
         table_data.sort((a, b) => {
             let aValue = a[field];
             let bValue = b[field];
@@ -247,6 +251,18 @@ $(document).ready(function () {
             } else {
                 if (!aValue) return 1; // Empty cells go last
                 if (!bValue) return -1; // Empty cells go last
+            }
+
+            // Convert to numbers for numeric comparison
+            if (typeof aValue === "number" && typeof bValue === "number") {
+                return order === "asc" ? aValue - bValue : bValue - aValue;
+            }
+
+            // Convert to Date objects for date comparison
+            if (isDate(aValue) && isDate(bValue)) {
+                aValue = new Date(aValue);
+                bValue = new Date(bValue);
+                return order === "asc" ? aValue - bValue : bValue - aValue;
             }
 
             // Case insensitivity: Convert to lower or upper case for comparison
