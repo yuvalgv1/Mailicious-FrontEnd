@@ -39,7 +39,7 @@ function exploreViews(currentPath) {
         }
     });
 }
-views_path = __dirname + "\\views";
+views_path = __dirname + "/views";
 views.push(views_path);
 exploreViews(views_path);
 app.set("views", views);
