@@ -42,9 +42,9 @@ $("form").on("submit", function (event) {
             }
         },
         error: function (res) {
-            console.log(1);
+            console.log(res);
+            console.log(res.responseJSON);
             if (res.responseJSON && res.responseJSON.error) {
-                console.log(2);
                 $("#error_message").text(res.responseJSON.error);
                 $("#error_message").addClass("container p-3");
             }

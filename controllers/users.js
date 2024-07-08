@@ -11,7 +11,6 @@ async function login(req, res) {
             .json({ error: "Username and password are required" });
     }
     try {
-        console.log(username);
         const response = await fetch(`${process.env.BACKEND_URL}/token`, {
             method: "POST",
             headers: {
@@ -35,7 +34,6 @@ async function login(req, res) {
                 .json({ id, message: "Login successful" });
         } else {
             // Invalid login credentials
-            console.log("Error");
             return res.status(response.status).json(data);
         }
     } catch (error) {
