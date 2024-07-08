@@ -16,7 +16,7 @@ async function login(req, res) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ "username": username, "password": password }),
+            body: JSON.stringify({ "\"username\"": username, "\"password\"": password }),
         });
 
         const data = await response.json();
