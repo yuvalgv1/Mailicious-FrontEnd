@@ -42,10 +42,12 @@ $("form").on("submit", function (event) {
             }
         },
         error: function (res) {
-            console.log(res);
-            console.log(res.responseJSON);
             if (res.responseJSON && res.responseJSON.error) {
                 $("#error_message").text(res.responseJSON.error);
+                $("#error_message").addClass("container p-3");
+            }
+            else {
+                $("#error_message").text(res.statusText);
                 $("#error_message").addClass("container p-3");
             }
             removeLoading(submit_button, button_text);
