@@ -16,14 +16,14 @@ async function login(req, res) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ "username": username, "password": password }),
         });
 
         const data = await response.json();
 
         if (response.ok) {
             // Set the token as a secure cookie
-            const { access_token , id } = data;
+            const { access_token, id } = data;
             res.cookie("access_token", access_token, {
                 httpOnly: false, // Allow JavaScript access
                 sameSite: "Strict", // Mitigates CSRF attacks
