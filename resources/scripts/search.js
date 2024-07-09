@@ -67,10 +67,10 @@ $(document).ready(function () {
     }
 
     // Convert the fields from the server
-    function setFields(Data) {
+    function setFields(data) {
         let keysMap = new Map();
 
-        Data.forEach((email) => {
+        data.forEach((email) => {
             Object.keys(email).forEach((key) => {
                 if (!keysMap.has(key)) {
                     keysMap.set(key, true);
