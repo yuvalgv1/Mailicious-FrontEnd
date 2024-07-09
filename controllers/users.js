@@ -31,10 +31,10 @@ async function login(req, res) {
             });
             return res
                 .status(response.status)
-                .json({ id, message: "Login successful" });
+                .json({ message: "Login successful" });
         } else {
             // Invalid login credentials
-            return response;
+            return res.status(response.status).json(data);
         }
     } catch (error) {
         return res.status(500).json({ error: "Internal Server Error" });
@@ -92,11 +92,10 @@ function logout(req, res) {
 // Get user data
 async function user(req, res) {
     try {
-        // Get user's details using its id
-        const { id } = req.query;
+        // Get user's details
         const token = req.cookies.access_token;
         const response = await fetch(
-            `${process.env.BACKEND_URL}/user?id=${id}`,
+            `${process.env.BACKEND_URL}/users/me`,
             {
                 method: "GET",
                 headers: {

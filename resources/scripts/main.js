@@ -44,9 +44,8 @@ $(document).ready(function () {
     $.ajax({
         url: "/user",
         type: "GET",
-        dataType: "json",
-        data: { id: localStorage.getItem("userId") },
         success: function (res) {
+            localStorage.setItem("userId", res.id);
             $(".profile-name").text(res.full_name);
         },
         error: function (res) {

@@ -52,7 +52,7 @@ $(document).ready(function () {
             success: function (response) {
                 $("#error_message").text("");
                 if (fields.length === 0) setFields(response);
-                table_data = response.emails;
+                table_data = response;
                 buildTable(table_data);
             },
             error: function (res) {
@@ -67,10 +67,10 @@ $(document).ready(function () {
     }
 
     // Convert the fields from the server
-    function setFields(jsonData) {
+    function setFields(Data) {
         let keysMap = new Map();
 
-        jsonData.emails.forEach((email) => {
+        Data.forEach((email) => {
             Object.keys(email).forEach((key) => {
                 if (!keysMap.has(key)) {
                     keysMap.set(key, true);
