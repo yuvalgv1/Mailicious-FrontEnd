@@ -2,8 +2,10 @@ $(document).ready(function () {
     let fields = [];
     let visibleFields = new Set();
     let url = "/search/email";
-    let send_data = JSON.stringify({});
+    let send_data = {};
     let table_data = "";
+    let from_time = null;
+    let to_time = null;
 
     // Variables to track current sort field and order
     let currentSortField = null;
@@ -29,11 +31,11 @@ $(document).ready(function () {
     $("#search-input").keypress(function (event) {
         if (event.which === 13 && $(this).val() != "") {
             url = "/search/text";
-            send_data = JSON.stringify({ text: $(this).val() });
+            send_data[text] = $(this).val();
             searchData();
         } else if ($(this).val() == "" && url == "/search/text") {
             url = "/search/email";
-            send_data = JSON.stringify({});
+            delete send_data[text];
             searchData();
         }
     });
@@ -46,7 +48,7 @@ $(document).ready(function () {
             url: url,
             type: "POST",
             contentType: "application/json",
-            data: send_data,
+            data: JSON.stringify(send_data),
             success: function (response) {
                 $("#error_message").text("");
                 if (fields.length === 0) setFields(response);
@@ -81,6 +83,7 @@ $(document).ready(function () {
         populateSortableList();
     }
 
+    // Display the data
     function buildTable() {
         // Enter the data from the table
         $table = $("#emails_table");
@@ -218,25 +221,45 @@ $(document).ready(function () {
     });
 
     // Show popup
-    $("#customize-table").click(function () {
-        $("#popup").toggle();
+    $(".help-button").click(function () {
+        $(`#${$(this).attr("data-popup-id")}`).toggle();
     });
 
     // Close popup
-    $("#close-popup").click(function () {
-        $("#popup").hide();
+    $(".close-popup").click(function () {
+        $(this).closest(".popup").hide();
     });
 
-    // Apply changes to table
-    $("#apply-changes").click(function () {
+    // Hide popup when clicking outside of it
+    $(document).mouseup(function (event) {
+        if (!$(event.target).closest(".popup").length) {
+            $(".popup").hide();
+        }
+    });
+
+    // Apply changes with the columns to table
+    $("#apply-column-changes").click(function () {
         buildTable();
-        $("#popup").hide();
+        $(this).closest(".popup").hide();
+    });
+
+    function modify_date_range(field, value) {
+        if (value) send_data[field] = value;
+        else delete send_data[field];
+    }
+
+    // Apply changes with the date range to table
+    $("#apply-date-filter").click(function () {
+        $(this).closest(".popup").hide();
+        modify_date_range("from_time", $("#from-date").val());
+        modify_date_range("to_time", $("#to-date").val());
+        searchData();
     });
 
     // Helper function to check if a value is a valid Date
     function isDate(value) {
         return new Date(value) !== "Invalid Date" && !isNaN(new Date(value));
-    };
+    }
 
     // Function to sort the table
     function sortTable(field, order) {

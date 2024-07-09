@@ -17,15 +17,24 @@
     </div>
     <button
         id="customize-table"
-        class="bg-info rounded-circle border border-0 position-absolute"
+        class="help-button"
         title="Customize Table"
+        data-popup-id="columns-popup"
     >
         <i class="fas fa-edit"></i>
     </button>
-    <div id="popup" class="popup rounded">
+    <button
+        id="date-filter"
+        class="help-button"
+        title="Select Range"
+        data-popup-id="date-popup"
+    >
+        <i class="fa-solid fa-calendar"></i>
+    </button>
+    <div id="columns-popup" class="popup">
         <div class="popup-header">
             <span>Customize Table</span>
-            <button id="close-popup" class="close-popup">&times;</button>
+            <button class="close-popup">&times;</button>
         </div>
         <div class="popup-content">
             <ul id="sortable-columns" class="list-group">
@@ -33,9 +42,22 @@
                     <!-- Columns will be dynamically added here -->
                 </ul>
             </ul>
-            <button id="apply-changes" class="btn btn-primary mt-3">
+            <button id="apply-column-changes" class="btn btn-primary mt-3">
                 Apply Changes
             </button>
+        </div>
+    </div>
+    <div id="date-popup" class="popup">
+        <div class="popup-header">
+            <span>Select Date Range</span>
+            <button class="close-popup">&times;</button>
+        </div>
+        <div class="popup-content">
+            <label for="from-date">From:</label>
+            <input type="datetime-local" id="from-date" class="form-control">
+            <label for="to-date">To:</label>
+            <input type="datetime-local" id="to-date" class="form-control">
+            <button id="apply-date-filter" class="btn btn-primary mt-2">Apply</button>
         </div>
     </div>
 </div>

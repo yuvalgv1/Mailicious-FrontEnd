@@ -6,27 +6,51 @@
     position: relative;
 }
 
-#customize-table {
+.help-button {
+    background-color: #0dcaf0; /* bg-info */
+    border-radius: 50%; /* rounded-circle */
+    border: none; /* border-0 */
+    position: absolute; /* position-absolute */ 
     width: 50px;
     height: 50px;
     top: 50%;
-    right: 10px;
     transform: translateY(-50%);
-    z-index: 1050;
+    z-index: 50;
+    transition: background-color 0.2s ease;
+}
+
+.help-button:active {
+    background-color: #117a8b; /* Darker shade of bg-info */
+}
+
+#customize-table {
+    right: 10px;
+}
+
+#date-filter {
+    right: 70px;
 }
 
 .popup {
     display: none; /* Initially hidden */
+    border-radius: 10%; /* rounded-circle */
     position: absolute;
-    top: calc(50% + 60px);
-    right: 80px; /* Position it next to the button */
+    top: calc(50% + 80px);
     transform: translateY(-50%);
     width: 250px; /* Set the width of the popup */
     padding: 20px;
     background-color: white;
     border: 1px solid #ddd;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1060; /* Ensure the popup is above other elements */
+    z-index: 60; /* Ensure the popup is above other elements */
+}
+
+#columns-popup {
+    right: 80px; /* Position it next to the button */
+}
+
+#date-popup {
+    right: 140px; /* Position it next to the button */
 }
 
 .popup-header {
