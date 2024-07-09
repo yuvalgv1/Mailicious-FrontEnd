@@ -17,7 +17,10 @@ async function login(req, res) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ username, password }),
+            data: {
+                username: 'detection_server@mailicious.com',
+                password: 'detection_server_password'
+            },
         });
 
         const data = await response.json();
