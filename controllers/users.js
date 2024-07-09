@@ -34,7 +34,7 @@ async function login(req, res) {
                 .json({ id, message: "Login successful" });
         } else {
             // Invalid login credentials
-            return res.status(response.status).json(data);
+            return response;
         }
     } catch (error) {
         return res.status(500).json({ error: "Internal Server Error" });
