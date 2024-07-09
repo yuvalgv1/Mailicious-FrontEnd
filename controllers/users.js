@@ -21,7 +21,7 @@ async function login(req, res) {
         });
 
         const data = await response.json();
-        console.log("Recieved...");
+        console.log(response);
 
         if (response.ok) {
             // Set the token as a secure cookie
