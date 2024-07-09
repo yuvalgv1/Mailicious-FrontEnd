@@ -6,7 +6,6 @@ async function searchText(req, res) {
     // Get the token from cookies
     const token = req.cookies.access_token;
     try {
-        const text = req.body.text;
         const response = await fetch(`${process.env.BACKEND_URL}/search/text`, {
             method: "POST",
             headers: {
