@@ -11,7 +11,6 @@ async function login(req, res) {
             .json({ error: "Username and password are required" });
     }
     try {
-        console.log("Sending...");
         const response = await fetch(`${process.env.BACKEND_URL}/token`, {
             method: "POST",
             headers: {
@@ -21,7 +20,6 @@ async function login(req, res) {
         });
 
         const data = await response.json();
-        console.log(response);
 
         if (response.ok) {
             // Set the token as a secure cookie
@@ -36,7 +34,7 @@ async function login(req, res) {
                 .json({ id, message: "Login successful" });
         } else {
             // Invalid login credentials
-            return response;
+            return res.status(response.status).json(data);
         }
     } catch (error) {
         return res.status(500).json({ error: "Internal Server Error" });
