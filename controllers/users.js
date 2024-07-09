@@ -18,7 +18,6 @@ async function login(req, res) {
             },
             body: JSON.stringify({ username, password }),
         });
-        console.log(response.status);
 
         const data = await response.json();
 
