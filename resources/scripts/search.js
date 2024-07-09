@@ -4,8 +4,6 @@ $(document).ready(function () {
     let url = "/search/email";
     let send_data = {};
     let table_data = "";
-    let from_time = null;
-    let to_time = null;
 
     // Variables to track current sort field and order
     let currentSortField = null;
