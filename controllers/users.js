@@ -95,7 +95,7 @@ async function user(req, res) {
         // Get user's details
         const token = req.cookies.access_token;
         const response = await fetch(
-            `${process.env.BACKEND_URL}/me`,
+            `${process.env.BACKEND_URL}/users/me`,
             {
                 method: "GET",
                 headers: {
