@@ -27,15 +27,13 @@ $("form").on("submit", function (event) {
 
     $.ajax({
         url: $(this).attr("action"),
-        type: "POST",
-        data: {
-            username: "detection_server@mailicious.com",
-            password: "detection_server_password",
-        },
+        type: $(this).attr("method").toUpperCase(),
+        dataType: "json",
+        data: $(this).serialize(), // Send the entire form data as JSON
         success: function (res) {
             path = sessionStorage.getItem("redirect_path");
             sessionStorage.removeItem("redirect_path");
-            console.log(res.id);
+            console.log(res.id)
             localStorage.setItem("userId", res.id);
             if (path) {
                 window.location.href = path;
@@ -46,6 +44,10 @@ $("form").on("submit", function (event) {
         error: function (res) {
             if (res.responseJSON && res.responseJSON.error) {
                 $("#error_message").text(res.responseJSON.error);
+                $("#error_message").addClass("container p-3");
+            }
+            else {
+                $("#error_message").text(res.statusText);
                 $("#error_message").addClass("container p-3");
             }
             removeLoading(submit_button, button_text);
