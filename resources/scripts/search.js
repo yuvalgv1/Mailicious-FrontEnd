@@ -165,7 +165,7 @@ $(document).ready(function () {
             const $row = $("<tr>");
             console.log(email);
             visibleFields.forEach((field) => {
-                if (field === "Verdict" && (email["analyses"].length !== 0) {
+                if (field === "Verdict" && (email["analyses"].length !== 0)) {
                     console.log(email["analyses"][0]["verdict_id"]);
                     $row.append(
                         $("<td>").text(
