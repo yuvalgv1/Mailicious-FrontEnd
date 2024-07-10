@@ -77,8 +77,11 @@ $(document).ready(function () {
         });
 
         fields = Array.from(keysMap.keys());
-        fields.pop();
-        fields.push("Verdict");
+        if (fields[fields.length - 1] === "analyses") {
+            fields.pop();
+            fields.push("Verdict");
+        }
+
         visibleFields = new Set(fields);
         populateSortableList();
     }
@@ -161,8 +164,14 @@ $(document).ready(function () {
         table_data.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
-                if (field == "Verdict") {
-                    $row.append($("<td>").text(email["analyses"][0]["verdict_id"]=== 1 ? "Malicious" : "Benign"));
+                if (field === "Verdict") {
+                    $row.append(
+                        $("<td>").text(
+                            email["analyses"][0]["verdict_id"] === 1
+                                ? "Malicious"
+                                : "Benign"
+                        )
+                    );
                 }
                 $row.append($("<td>").text(email[field] || ""));
             });
@@ -313,15 +322,21 @@ $(document).ready(function () {
     searchData();
 });
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // Function to format date and time as yyyy-mm-ddThh:mm
     function formatDateTime(date) {
-        const pad = (n) => n < 10 ? '0' + n : n;
-        return date.getFullYear() + '-' +
-               pad(date.getMonth() + 1) + '-' +
-               pad(date.getDate()) + 'T' +
-               pad(date.getHours()) + ':' +
-               pad(date.getMinutes());
+        const pad = (n) => (n < 10 ? "0" + n : n);
+        return (
+            date.getFullYear() +
+            "-" +
+            pad(date.getMonth() + 1) +
+            "-" +
+            pad(date.getDate()) +
+            "T" +
+            pad(date.getHours()) +
+            ":" +
+            pad(date.getMinutes())
+        );
     }
 
     // Set max attribute to current date and time
@@ -332,17 +347,19 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("to-date").max = maxDateTime;
 
     // Ensure from-date is always before to-date
-    document.getElementById("from-date").addEventListener("change", function() {
-        const fromDate = new Date(this.value);
-        const toDateElem = document.getElementById("to-date");
-        const toDate = new Date(toDateElem.value);
+    document
+        .getElementById("from-date")
+        .addEventListener("change", function () {
+            const fromDate = new Date(this.value);
+            const toDateElem = document.getElementById("to-date");
+            const toDate = new Date(toDateElem.value);
 
-        if (fromDate > toDate) {
-            toDateElem.value = this.value;
-        }
-    });
+            if (fromDate > toDate) {
+                toDateElem.value = this.value;
+            }
+        });
 
-    document.getElementById("to-date").addEventListener("change", function() {
+    document.getElementById("to-date").addEventListener("change", function () {
         const toDate = new Date(this.value);
         const fromDateElem = document.getElementById("from-date");
         const fromDate = new Date(fromDateElem.value);
