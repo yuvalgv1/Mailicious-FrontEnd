@@ -29,11 +29,11 @@ $(document).ready(function () {
     $("#search-input").keypress(function (event) {
         if (event.which === 13 && $(this).val() != "") {
             url = "/search/text";
-            send_data[text] = $(this).val();
+            send_data["text"] = $(this).val();
             searchData();
         } else if ($(this).val() == "" && url == "/search/text") {
             url = "/search/email";
-            delete send_data[text];
+            delete send_data["text"];
             searchData();
         }
     });
@@ -163,10 +163,8 @@ $(document).ready(function () {
         );
         table_data.forEach((email) => {
             const $row = $("<tr>");
-            console.log(email);
             visibleFields.forEach((field) => {
                 if (field === "Verdict" && (email["analyses"].length !== 0)) {
-                    console.log(email["analyses"][0]["verdict_id"]);
                     $row.append(
                         $("<td>").text(
                             
