@@ -167,7 +167,7 @@ $(document).ready(function () {
                 if (field === "Verdict") {
                     $row.append(
                         $("<td>").text(
-                            email["analyses"][0]["verdict_id"] === 1
+                            email["analyses"][0]["verdict_id"] === 0
                                 ? "Malicious"
                                 : "Benign"
                         )
