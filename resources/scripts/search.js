@@ -163,10 +163,13 @@ $(document).ready(function () {
         );
         table_data.forEach((email) => {
             const $row = $("<tr>");
+            console.log(email);
             visibleFields.forEach((field) => {
                 if (field === "Verdict") {
+                    console.log(email["analyses"][0]["verdict_id"]);
                     $row.append(
                         $("<td>").text(
+                            
                             email["analyses"][0]["verdict_id"] === 0
                                 ? "Malicious"
                                 : "Benign"
