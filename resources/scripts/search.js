@@ -165,12 +165,12 @@ $(document).ready(function () {
             const $row = $("<tr>");
             console.log(email);
             visibleFields.forEach((field) => {
-                if (field === "Verdict") {
+                if (field === "Verdict" && email["analyses"].length === 0) {
                     console.log(email["analyses"][0]["verdict_id"]);
                     $row.append(
                         $("<td>").text(
                             
-                            email["analyses"][0]["verdict_id"] === 0
+                            email["analyses"][0]["verdict_id"] === 2
                                 ? "Malicious"
                                 : "Benign"
                         )
