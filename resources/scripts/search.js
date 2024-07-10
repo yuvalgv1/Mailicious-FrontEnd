@@ -77,6 +77,8 @@ $(document).ready(function () {
         });
 
         fields = Array.from(keysMap.keys());
+        fields.pop();
+        fields.push("Verdict");
         visibleFields = new Set(fields);
         populateSortableList();
     }
@@ -159,6 +161,9 @@ $(document).ready(function () {
         table_data.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
+                if (field == "Verdict") {
+                    $row.append($("<td>").text(email["analyses"][0]["verdict_id"]=== 1 ? "Malicious" : "Benign"));
+                }
                 $row.append($("<td>").text(email[field] || ""));
             });
             $table_body.append($row);
