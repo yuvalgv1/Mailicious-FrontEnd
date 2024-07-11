@@ -84,7 +84,7 @@ $(document).ready(function () {
         fields = Array.from(keysMap.keys());
         if (fields[fields.length - 1] === "analyses") {
             fields.pop();
-            fields.push("Verdict");
+            fields.push("verdict");
         }
 
         visibleFields = new Set(fields);
@@ -243,7 +243,7 @@ $(document).ready(function () {
         table_data.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
-                if (field === "Verdict" && email["analyses"].length !== 0) {
+                if (field === "verdict" && email["analyses"].length !== 0) {
                     $row.append(
                         $("<td>").text(
                             email["analyses"][0]["verdict_id"] === 2
@@ -365,7 +365,7 @@ $(document).ready(function () {
     function apply_filter(button, field) {
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
-            if (field === "Verdict") {
+            if (field === "verdict") {
                 console.log($(`#${button.attr("data-input-filter-id")}`).val())
                 if (
                     "Malicious".indexOf(
