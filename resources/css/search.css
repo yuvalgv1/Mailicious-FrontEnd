@@ -1,3 +1,7 @@
+:root {
+    --popup-distance: 100px;
+}
+
 .search-input {
     outline: none;
 }
@@ -10,7 +14,7 @@
     background-color: #0dcaf0; /* bg-info */
     border-radius: 50%; /* rounded-circle */
     border: none; /* border-0 */
-    position: absolute; /* position-absolute */ 
+    position: absolute; /* position-absolute */
     width: 50px;
     height: 50px;
     top: 50%;
@@ -31,6 +35,12 @@
     right: 70px;
 }
 
+.filter-button {
+    border-radius: 10%;
+    outline: none;
+    background-color: transparent;
+}
+
 .popup {
     display: none; /* Initially hidden */
     border-radius: 10%; /* rounded-circle */
@@ -43,14 +53,6 @@
     border: 1px solid #ddd;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 60; /* Ensure the popup is above other elements */
-}
-
-#columns-popup {
-    right: 80px; /* Position it next to the button */
-}
-
-#date-popup {
-    right: 140px; /* Position it next to the button */
 }
 
 .popup-header {
@@ -96,12 +98,12 @@
 th {
     position: relative;
 }
-.sort-button {
+.header-button {
     background: none;
     border: none;
     padding: 0;
     margin: 0;
 }
-.sort-button i {
+.header-button i {
     margin-left: 5px;
 }

@@ -42,7 +42,7 @@ $(document).ready(function () {
         loadData();
         $.ajax({
             url: url,
-            type: "GET",
+            type: "POST",
             contentType: "application/json",
             data: JSON.stringify(send_data),
             success: function (response) {
@@ -111,10 +111,59 @@ $(document).ready(function () {
                 text: field,
             }).appendTo($headerContent);
 
+            // Add filter button
+            $("<button/>", {
+                id: `${field}-filter-button`,
+                type: "button",
+                class: "btn btn-sm filter-button header-button has-popup",
+                title: "Filter Column",
+                "data-field": field,
+                "data-popup-id": `${field}-popup`,
+            })
+                .html('<i class="fa-solid fa-filter"></i>')
+                .appendTo($headerContent);
+
+            $("<div/>", {
+                id: `${field}-popup`,
+                class: "popup",
+            })
+                .append(
+                    $("<div/>", {
+                        class: "popup-header",
+                    })
+                        .append($("<span/>").text("Field Contains:"))
+                        .append(
+                            $("<button/>", {
+                                class: "close-popup",
+                            }).html("&times;")
+                        )
+                )
+                .append(
+                    $("<div/", {
+                        class: "popup-content",
+                    })
+                        .append(
+                            $("<input/>", {
+                                type: "text",
+                                id: `${field}-filter-input`,
+                                class: "form-control",
+                            })
+                        )
+                        .append(
+                            $("<button/>", {
+                                id: `apply-filter-${field}`,
+                                class: "btn btn-primary mt-2 apply-filter",
+                                "data-input-filter-id": `${field}-filter-input`,
+                            }).text("Apply")
+                        )
+                )
+                .appendTo($headerContent);
+
             // Add sorting button
             let $sortButton = $("<button/>", {
                 type: "button",
-                class: "btn btn-sm sort-button",
+                class: "btn btn-sm sort-button header-button",
+                title: "Sort",
                 "data-field": field,
                 "data-sort": "asc", // Initial sort state
             })
@@ -162,10 +211,9 @@ $(document).ready(function () {
         table_data.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
-                if (field === "Verdict" && (email["analyses"].length !== 0)) {
+                if (field === "Verdict" && email["analyses"].length !== 0) {
                     $row.append(
                         $("<td>").text(
-                            
                             email["analyses"][0]["verdict_id"] === 2
                                 ? "Malicious"
                                 : "Benign"
@@ -231,14 +279,30 @@ $(document).ready(function () {
         },
     });
 
-    // Show popup
-    $(".help-button").click(function () {
-        $(`#${$(this).attr("data-popup-id")}`).toggle();
-    });
+    // Function to handle button clicks and toggle the corresponding popup
+    function togglePopup(button, popup) {
+        console.log("yes");
+        if (button.length && popup.length) {
+            const offset = button.offset();
+            if (offset) {
+                popup.css({
+                    display: popup.is(":visible") ? "none" : "block",
+                    left:
+                        button.offset().left -
+                        popup.outerWidth() -
+                        parseInt(
+                            getComputedStyle(
+                                document.documentElement
+                            ).getPropertyValue("--popup-distance")
+                        ), // Position to the left of the button
+                });
+            }
+        }
+    }
 
-    // Close popup
-    $(".close-popup").click(function () {
-        $(this).closest(".popup").hide();
+    // Event listener for table customization button
+    $(".has-popup").click(function () {
+        togglePopup($(this), $(`#${$(this).attr("data-popup-id")}`));
     });
 
     // Hide popup when clicking outside of it
@@ -251,6 +315,18 @@ $(document).ready(function () {
     // Apply changes with the columns to table
     $("#apply-column-changes").click(function () {
         buildTable();
+        $(this).closest(".popup").hide();
+    });
+
+    // Event listener for apply filter button inside each popup
+    $(".apply-filter").click(function () {
+        const inputValue = $(`#${$(this).attr("data-input-filter-id")}`).val();
+        if (inputValue) {
+            send_data[field] = inputValue;
+        } else {
+            delete send_data[field];
+        }
+        searchData();
         $(this).closest(".popup").hide();
     });
 

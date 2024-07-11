@@ -22,6 +22,6 @@ router.get("/settings", usersController.isLoggedIn, pagesController.settings);
 
 // Actions Controller
 router.post("/search/text", actionsontroller.searchText);
-router.get("/search/advanced", actionsontroller.search);
+router.post("/search/advanced", actionsontroller.search);
 
 module.exports = router;
