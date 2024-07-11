@@ -364,7 +364,8 @@ $(document).ready(function () {
     // Event listener for apply filter button inside each popup
     function apply_filter(button, field) {
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
-        console.log(inputValue);
+        console.log($(`#${button.attr("data-input-filter-id")}`));
+        console.log(button.attr("data-input-filter-id"));
         if (inputValue) {
             if (field === "verdict") {
                 console.log("ver");
