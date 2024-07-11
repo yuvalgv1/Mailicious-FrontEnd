@@ -23,11 +23,11 @@ async function searchText(req, res) {
     }
 }
 
-async function searchEmail(req, res) {
+async function search(req, res) {
     // Get the token from cookies
     const token = req.cookies.access_token;
     try {
-        const response = await fetch(`${process.env.BACKEND_URL}/search/email`, {
+        const response = await fetch(`${process.env.BACKEND_URL}/search/advanced`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -46,5 +46,5 @@ async function searchEmail(req, res) {
 
 module.exports = {
     searchText,
-    searchEmail
+    search
 };
