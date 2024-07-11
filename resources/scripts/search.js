@@ -26,6 +26,13 @@ $(document).ready(function () {
         $("#loading-message").html("");
     }
 
+    // Function to clear filter-related localStorage items
+    function clearFilterLocalStorage() {
+        visibleFields.forEach(field => {
+            localStorage.removeItem(`${field}-filter-input-value`);
+        });
+    }
+
     $("#search-input").keypress(function (event) {
         if (event.which === 13 && $(this).val() != "") {
             send_data["text"] = $(this).val();
@@ -357,7 +364,11 @@ $(document).ready(function () {
     function apply_filter(button, field) {
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
-            send_data[field] = inputValue;
+            if (field === "Verdict") {
+                if ("Malicious".indexOf($(`#${button.attr("data-input-filter-id").val()}`)) !== -1) {
+                    send_data[field] = 2;
+                } else send_data[field] = 1;
+            } else send_data[field] = inputValue;
             // Store input value in local storage
             localStorage.setItem(`${field}-filter-input-value`, inputValue);
             // Add background color when filter is applied
@@ -439,6 +450,7 @@ $(document).ready(function () {
     }
 
     searchData();
+    clearFilterLocalStorage();
 });
 
 document.addEventListener("DOMContentLoaded", function () {
