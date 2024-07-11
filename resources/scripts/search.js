@@ -121,7 +121,13 @@ $(document).ready(function () {
                 "data-popup-id": `${field}-popup`,
             })
                 .html('<i class="fa-solid fa-filter"></i>')
-                .appendTo($headerContent);
+                .appendTo($headerContent)
+                .click(function () {
+                    togglePopup(
+                        $(this),
+                        $(`#${$(this).attr("data-popup-id")}`)
+                    );
+                });
 
             $("<div/>", {
                 id: `${field}-popup`,
@@ -139,7 +145,7 @@ $(document).ready(function () {
                         )
                 )
                 .append(
-                    $("<div/", {
+                    $("<div/>", {
                         class: "popup-content",
                     })
                         .append(
@@ -147,6 +153,14 @@ $(document).ready(function () {
                                 type: "text",
                                 id: `${field}-filter-input`,
                                 class: "form-control",
+                            }).keypress(function(event) {
+                                if (event.which === 13 && $(this).val() != "") {
+                                    send_data[field] = $(this).val();
+                                    searchData();
+                                } else if ($(this).val() == "" && url == "/search/text") {
+                                    delete send_data[field];
+                                    searchData();
+                                }
                             })
                         )
                         .append(
@@ -154,7 +168,9 @@ $(document).ready(function () {
                                 id: `apply-filter-${field}`,
                                 class: "btn btn-primary mt-2 apply-filter",
                                 "data-input-filter-id": `${field}-filter-input`,
-                            }).text("Apply")
+                            }).text("Apply").click(function() {
+                                apply_filter($(this), field)
+                            })
                         )
                 )
                 .appendTo($headerContent);
@@ -281,21 +297,24 @@ $(document).ready(function () {
 
     // Function to handle button clicks and toggle the corresponding popup
     function togglePopup(button, popup) {
-        console.log("yes");
         if (button.length && popup.length) {
             const offset = button.offset();
             if (offset) {
                 popup.css({
                     display: popup.is(":visible") ? "none" : "block",
-                    left:
-                        button.offset().left -
-                        popup.outerWidth() -
-                        parseInt(
-                            getComputedStyle(
-                                document.documentElement
-                            ).getPropertyValue("--popup-distance")
-                        ), // Position to the left of the button
                 });
+                if (button.hasClass("help-button")) {
+                    popup.css({
+                        left:
+                            button.offset().left -
+                            popup.outerWidth() -
+                            parseInt(
+                                getComputedStyle(
+                                    document.documentElement
+                                ).getPropertyValue("--popup-distance")
+                            ), // Position to the left of the button
+                    });
+                }
             }
         }
     }
@@ -319,16 +338,16 @@ $(document).ready(function () {
     });
 
     // Event listener for apply filter button inside each popup
-    $(".apply-filter").click(function () {
-        const inputValue = $(`#${$(this).attr("data-input-filter-id")}`).val();
+    function apply_filter(button, field) {
+        const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
             send_data[field] = inputValue;
         } else {
             delete send_data[field];
         }
-        searchData();
         $(this).closest(".popup").hide();
-    });
+        searchData();
+    };
 
     function modify_date_range(field, value) {
         if (value) send_data[field] = value;
