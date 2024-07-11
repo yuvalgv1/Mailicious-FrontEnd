@@ -28,7 +28,7 @@ async function search(req, res) {
     const token = req.cookies.access_token;
     try {
         const response = await fetch(`${process.env.BACKEND_URL}/search/advanced`, {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,

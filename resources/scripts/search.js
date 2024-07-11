@@ -42,7 +42,7 @@ $(document).ready(function () {
         loadData();
         $.ajax({
             url: url,
-            type: "POST",
+            type: "GET",
             contentType: "application/json",
             data: JSON.stringify(send_data),
             success: function (response) {
