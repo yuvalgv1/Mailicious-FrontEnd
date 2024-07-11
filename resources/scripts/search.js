@@ -361,14 +361,14 @@ $(document).ready(function () {
             // Store input value in local storage
             localStorage.setItem(`${field}-filter-input-value`, inputValue);
             // Add background color when filter is applied
-            filterButton.addClass("filter-applied");
+            button.addClass("filter-applied");
         } else {
             delete send_data[field];
 
             // Clear input value in local storage
             localStorage.removeItem(`${field}-filter-input-value`);
             // Add background color when filter is applied
-            filterButton.removeClass("filter-applied");
+            button.removeClass("filter-applied");
         }
         $(this).closest(".popup").hide();
         searchData();
