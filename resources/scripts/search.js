@@ -28,7 +28,7 @@ $(document).ready(function () {
 
     // Function to clear filter-related localStorage items
     function clearFilterLocalStorage() {
-        visibleFields.forEach(field => {
+        visibleFields.forEach((field) => {
             localStorage.removeItem(`${field}-filter-input-value`);
         });
     }
@@ -163,16 +163,17 @@ $(document).ready(function () {
                                 type: "text",
                                 id: `${field}-filter-input`,
                                 class: "form-control",
+                                "data-button-filter-id": `${field}-filter-button`,
                             }).keypress(function (event) {
-                                if (event.which === 13 && $(this).val() != "") {
-                                    send_data[field] = $(this).val();
-                                    searchData();
-                                } else if (
-                                    $(this).val() == "" &&
-                                    url == "/search/text"
-                                ) {
-                                    delete send_data[field];
-                                    searchData();
+                                if (event.which === 13) {
+                                    apply_filter(
+                                        $(
+                                            `#${$(this).attr(
+                                                "data-button-filter-id"
+                                            )}`
+                                        ),
+                                        field
+                                    );
                                 }
                             })
                         )
@@ -365,7 +366,11 @@ $(document).ready(function () {
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
             if (field === "Verdict") {
-                if ("Malicious".indexOf($(`#${button.attr("data-input-filter-id").val()}`)) !== -1) {
+                if (
+                    "Malicious".indexOf(
+                        $(`#${button.attr("data-input-filter-id").val()}`)
+                    ) !== -1
+                ) {
                     send_data[field] = 2;
                 } else send_data[field] = 1;
             } else send_data[field] = inputValue;
