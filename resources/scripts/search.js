@@ -366,12 +366,19 @@ $(document).ready(function () {
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
             if (field === "Verdict") {
+                console.log($(`#${button.attr("data-input-filter-id")}`).val())
                 if (
                     "Malicious".indexOf(
                         $(`#${button.attr("data-input-filter-id")}`).val()
                     ) !== -1
                 ) {
                     send_data[field] = 2;
+                } else if (
+                    "Malicious".indexOf(
+                        $(`#${button.attr("data-input-filter-id")}`).val()
+                    ) !== -1
+                ) {
+                    send_data[field] = 1;
                 } else send_data[field] = 1;
             } else send_data[field] = inputValue;
             // Store input value in local storage
