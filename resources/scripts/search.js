@@ -1,7 +1,7 @@
 $(document).ready(function () {
     let fields = [];
     let visibleFields = new Set();
-    let url = "/search/email";
+    let url = "/search/advanced";
     let send_data = {};
     let table_data = "";
 
@@ -28,11 +28,9 @@ $(document).ready(function () {
 
     $("#search-input").keypress(function (event) {
         if (event.which === 13 && $(this).val() != "") {
-            url = "/search/text";
             send_data["text"] = $(this).val();
             searchData();
         } else if ($(this).val() == "" && url == "/search/text") {
-            url = "/search/email";
             delete send_data["text"];
             searchData();
         }
