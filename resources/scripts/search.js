@@ -368,7 +368,7 @@ $(document).ready(function () {
             if (field === "Verdict") {
                 if (
                     "Malicious".indexOf(
-                        $(`#${button.attr("data-input-filter-id").val()}`)
+                        $(`#${button.attr("data-input-filter-id")}`).val()
                     ) !== -1
                 ) {
                     send_data[field] = 2;
