@@ -127,6 +127,9 @@ $(document).ready(function () {
                         $(this),
                         $(`#${$(this).attr("data-popup-id")}`)
                     );
+
+                    // Set input value from local storage
+                    setInputValueFromLocalStorage(field);
                 });
 
             $("<div/>", {
@@ -153,11 +156,14 @@ $(document).ready(function () {
                                 type: "text",
                                 id: `${field}-filter-input`,
                                 class: "form-control",
-                            }).keypress(function(event) {
+                            }).keypress(function (event) {
                                 if (event.which === 13 && $(this).val() != "") {
                                     send_data[field] = $(this).val();
                                     searchData();
-                                } else if ($(this).val() == "" && url == "/search/text") {
+                                } else if (
+                                    $(this).val() == "" &&
+                                    url == "/search/text"
+                                ) {
                                     delete send_data[field];
                                     searchData();
                                 }
@@ -168,9 +174,11 @@ $(document).ready(function () {
                                 id: `apply-filter-${field}`,
                                 class: "btn btn-primary mt-2 apply-filter",
                                 "data-input-filter-id": `${field}-filter-input`,
-                            }).text("Apply").click(function() {
-                                apply_filter($(this), field)
                             })
+                                .text("Apply")
+                                .click(function () {
+                                    apply_filter($(this), field);
+                                })
                         )
                 )
                 .appendTo($headerContent);
@@ -324,6 +332,14 @@ $(document).ready(function () {
         togglePopup($(this), $(`#${$(this).attr("data-popup-id")}`));
     });
 
+    // Function to set input value from local storage
+    function setInputValueFromLocalStorage(field) {
+        const storedValue = localStorage.getItem(`${field}-filter-input-value`);
+        if (storedValue) {
+            $(`#${field}-filter-input`).val(storedValue);
+        }
+    }
+
     // Hide popup when clicking outside of it
     $(document).mouseup(function (event) {
         if (!$(event.target).closest(".popup").length) {
@@ -339,15 +355,22 @@ $(document).ready(function () {
 
     // Event listener for apply filter button inside each popup
     function apply_filter(button, field) {
+        
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
             send_data[field] = inputValue;
+
+            // Store input value in local storage
+            localStorage.setItem(`${field}-filter-input-value`, inputValue);
         } else {
             delete send_data[field];
+
+            // Clear input value in local storage
+            localStorage.removeItem(`${field}-filter-input-value`);
         }
         $(this).closest(".popup").hide();
         searchData();
-    };
+    }
 
     function modify_date_range(field, value) {
         if (value) send_data[field] = value;
