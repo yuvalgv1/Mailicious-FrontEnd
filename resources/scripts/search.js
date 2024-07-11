@@ -355,18 +355,20 @@ $(document).ready(function () {
 
     // Event listener for apply filter button inside each popup
     function apply_filter(button, field) {
-        
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
             send_data[field] = inputValue;
-
             // Store input value in local storage
             localStorage.setItem(`${field}-filter-input-value`, inputValue);
+            // Add background color when filter is applied
+            filterButton.addClass("filter-applied");
         } else {
             delete send_data[field];
 
             // Clear input value in local storage
             localStorage.removeItem(`${field}-filter-input-value`);
+            // Add background color when filter is applied
+            filterButton.removeClass("filter-applied");
         }
         $(this).closest(".popup").hide();
         searchData();
