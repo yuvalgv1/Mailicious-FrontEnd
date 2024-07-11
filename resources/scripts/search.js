@@ -363,10 +363,8 @@ $(document).ready(function () {
 
     // Event listener for apply filter button inside each popup
     function apply_filter(button, field) {
-        console.log($(`#${button.attr("data-input-filter-id")}`));
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
-            console.log($(`#${button.attr("data-input-filter-id")}`).val())
             if (field === "verdict") {
                 if (
                     "Malicious".indexOf(
