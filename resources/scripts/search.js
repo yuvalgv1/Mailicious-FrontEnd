@@ -1,7 +1,32 @@
+// Function to handle button clicks and toggle the corresponding popup
+function togglePopup(button, popup) {
+    if (button.length && popup.length) {
+        const offset = button.offset();
+        if (offset) {
+            popup.css({
+                display: popup.is(":visible") ? "none" : "block",
+            });
+            if (button.hasClass("help-button")) {
+                popup.css({
+                    left:
+                        button.offset().left -
+                        popup.outerWidth() -
+                        parseInt(
+                            getComputedStyle(
+                                document.documentElement
+                            ).getPropertyValue("--popup-distance")
+                        ), // Position to the left of the button
+                });
+            }
+        }
+    }
+}
+
+// Main function for the search page
 $(document).ready(function () {
+    // Set variables for the code
     let fields = [];
     let visibleFields = new Set();
-    let url = "/search/advanced";
     let send_data = {};
     let table_data = "";
 
@@ -26,20 +51,15 @@ $(document).ready(function () {
         $("#loading-message").html("");
     }
 
-    // Function to clear filter-related localStorage items
-    function clearFilterLocalStorage() {
-        visibleFields.forEach((field) => {
-            localStorage.removeItem(`${field}-filter-input-value`);
-        });
-    }
-
     $("#search-input").keypress(function (event) {
-        if (event.which === 13 && $(this).val() != "") {
-            send_data["text"] = $(this).val();
-            searchData();
-        } else if ($(this).val() == "" && url == "/search/text") {
-            delete send_data["text"];
-            searchData();
+        if (event.which === 13) {
+            if ($(this).val() != "") {
+                send_data["text"] = $(this).val();
+                searchData();
+            } else {
+                delete send_data["text"];
+                searchData();
+            }
         }
     });
 
@@ -48,7 +68,7 @@ $(document).ready(function () {
         $("#emails_table").empty();
         loadData();
         $.ajax({
-            url: url,
+            url: "/search",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(send_data),
@@ -82,10 +102,6 @@ $(document).ready(function () {
         });
 
         fields = Array.from(keysMap.keys());
-        if (fields[fields.length - 1] === "analyses") {
-            fields.pop();
-            fields.push("verdict");
-        }
 
         visibleFields = new Set(fields);
         populateSortableList();
@@ -134,9 +150,6 @@ $(document).ready(function () {
                         $(this),
                         $(`#${$(this).attr("data-popup-id")}`)
                     );
-
-                    // Set input value from local storage
-                    setInputValueFromLocalStorage(field);
                 });
 
             $("<div/>", {
@@ -151,7 +164,11 @@ $(document).ready(function () {
                         .append(
                             $("<button/>", {
                                 class: "close-popup",
-                            }).html("&times;")
+                            })
+                                .html("&times;")
+                                .click(function () {
+                                    $(this).parent().parent().hide();
+                                })
                         )
                 )
                 .append(
@@ -243,15 +260,6 @@ $(document).ready(function () {
         table_data.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
-                if (field === "verdict" && email["analyses"].length !== 0) {
-                    $row.append(
-                        $("<td>").text(
-                            email["analyses"][0]["verdict_id"] === 2
-                                ? "Malicious"
-                                : "Benign"
-                        )
-                    );
-                }
                 $row.append($("<td>").text(email[field] || ""));
             });
             $table_body.append($row);
@@ -311,42 +319,14 @@ $(document).ready(function () {
         },
     });
 
-    // Function to handle button clicks and toggle the corresponding popup
-    function togglePopup(button, popup) {
-        if (button.length && popup.length) {
-            const offset = button.offset();
-            if (offset) {
-                popup.css({
-                    display: popup.is(":visible") ? "none" : "block",
-                });
-                if (button.hasClass("help-button")) {
-                    popup.css({
-                        left:
-                            button.offset().left -
-                            popup.outerWidth() -
-                            parseInt(
-                                getComputedStyle(
-                                    document.documentElement
-                                ).getPropertyValue("--popup-distance")
-                            ), // Position to the left of the button
-                    });
-                }
-            }
-        }
-    }
-
     // Event listener for table customization button
     $(".has-popup").click(function () {
         togglePopup($(this), $(`#${$(this).attr("data-popup-id")}`));
     });
 
-    // Function to set input value from local storage
-    function setInputValueFromLocalStorage(field) {
-        const storedValue = localStorage.getItem(`${field}-filter-input-value`);
-        if (storedValue) {
-            $(`#${field}-filter-input`).val(storedValue);
-        }
-    }
+    $(".close-popup").click(function () {
+        $(this).parent().parent().hide();
+    });
 
     // Hide popup when clicking outside of it
     $(document).mouseup(function (event) {
@@ -357,8 +337,8 @@ $(document).ready(function () {
 
     // Apply changes with the columns to table
     $("#apply-column-changes").click(function () {
-        buildTable();
         $(this).closest(".popup").hide();
+        buildTable();
     });
 
     // Event listener for apply filter button inside each popup
@@ -367,31 +347,16 @@ $(document).ready(function () {
         console.log($(`#${button.attr("data-input-filter-id")}`));
         console.log(button.attr("data-input-filter-id"));
         if (inputValue) {
-            if (field === "verdict") {
-                console.log("ver");
-                if (
-                    "Malicious".indexOf(
-                        $(`#${button.attr("data-input-filter-id")}`).val()
-                    ) !== -1
-                ) {
-                    send_data[field] = 2;
-                } else if (
-                    "Benign".indexOf(
-                        $(`#${button.attr("data-input-filter-id")}`).val()
-                    ) !== -1
-                ) {
-                    send_data[field] = 1;
-                }
-            } else send_data[field] = inputValue;
+            send_data[field] = inputValue;
             // Store input value in local storage
-            localStorage.setItem(`${field}-filter-input-value`, inputValue);
+            //localStorage.setItem(`${field}-filter-input-value`, inputValue);
             // Add background color when filter is applied
             button.addClass("filter-applied");
         } else {
             delete send_data[field];
 
             // Clear input value in local storage
-            localStorage.removeItem(`${field}-filter-input-value`);
+            // localStorage.removeItem(`${field}-filter-input-value`);
             // Add background color when filter is applied
             button.removeClass("filter-applied");
         }
@@ -464,7 +429,6 @@ $(document).ready(function () {
     }
 
     searchData();
-    clearFilterLocalStorage();
 });
 
 document.addEventListener("DOMContentLoaded", function () {
