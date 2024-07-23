@@ -29,6 +29,7 @@ $(document).ready(function () {
     let visibleFields = new Set();
     let send_data = {};
     let table_data = "";
+    let sub_map_fields = {};
 
     // Variables to track current sort field and order
     let currentSortField = null;
@@ -63,6 +64,27 @@ $(document).ready(function () {
         }
     });
 
+    // Get the data in an email using the custom fields
+    function getFieldData(email, field) {
+        if (email[field]) {
+            return email[field];
+        } else if (sub_map_fields.hasOwnProperty(field)) {
+            const fieldPath = sub_map_fields[field];
+            let current = email;
+
+            for (let i = 0; i < fieldPath.length; i++) {
+                if (current[fieldPath[i]] === undefined) {
+                    return "";
+                }
+                current = current[fieldPath[i]];
+            }
+
+            return current;
+        } else {
+            return "";
+        }
+    }
+
     // Send to the server a request for a new query
     function searchData() {
         $("#emails_table").empty();
@@ -74,9 +96,9 @@ $(document).ready(function () {
             data: JSON.stringify(send_data),
             success: function (response) {
                 $("#error_message").text("");
-                if (fields.length === 0) setFields(response);
                 table_data = response;
-                buildTable(table_data);
+                if (fields.length === 0) setFields(table_data);
+                buildTable();
             },
             error: function (res) {
                 if (res.status == 401) window.location.href = "/login";
@@ -93,13 +115,30 @@ $(document).ready(function () {
     function setFields(data) {
         let keysMap = new Map();
 
-        data.forEach((email) => {
-            Object.keys(email).forEach((key) => {
-                if (!keysMap.has(key)) {
-                    keysMap.set(key, true);
+        // Function to extract keys and their types, including nested keys
+        function extractKeys(obj, parentKey = "") {
+            Object.keys(obj).forEach((key) => {
+                const fullKey = parentKey ? `${parentKey}_${key}` : key;
+
+                if (
+                    typeof obj[key] === "object" &&
+                    obj[key] !== null &&
+                    !Array.isArray(obj[key])
+                ) {
+                    extractKeys(obj[key], fullKey);
+                } else {
+                    const valueType = typeof obj[key];
+                    keysMap.set(fullKey, valueType);
+                    if (parentKey) {
+                        sub_map_fields[fullKey] = parentKey
+                            .split("_")
+                            .concat(key);
+                    }
                 }
             });
-        });
+        }
+
+        data.forEach((email) => extractKeys(email));
 
         fields = Array.from(keysMap.keys());
 
@@ -180,10 +219,10 @@ $(document).ready(function () {
                                 type: "text",
                                 id: `${field}-filter-input`,
                                 class: "form-control",
-                                "data-button-filter-id": `${field}-filter-button`,
+                                "data-button-filter-id": `apply-filter-${field}`,
                             }).keypress(function (event) {
                                 if (event.which === 13) {
-                                    apply_filter(
+                                    applyFilter(
                                         $(
                                             `#${$(this).attr(
                                                 "data-button-filter-id"
@@ -202,7 +241,7 @@ $(document).ready(function () {
                             })
                                 .text("Apply")
                                 .click(function () {
-                                    apply_filter($(this), field);
+                                    applyFilter($(this), field);
                                 })
                         )
                 )
@@ -260,7 +299,7 @@ $(document).ready(function () {
         table_data.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
-                $row.append($("<td>").text(email[field] || ""));
+                $row.append($("<td>").text(getFieldData(email, field)));
             });
             $table_body.append($row);
         });
@@ -341,20 +380,77 @@ $(document).ready(function () {
         buildTable();
     });
 
+    // Add or update a field by value
+    function addField(field, value) {
+        const fieldPath = sub_map_fields[field];
+        if (!fieldPath) {
+            send_data[field] = value;
+        } else {
+            let current = send_data;
+
+            for (let i = 0; i < fieldPath.length - 1; i++) {
+                if (!current[fieldPath[i]]) {
+                    current[fieldPath[i]] = {};
+                }
+                current = current[fieldPath[i]];
+            }
+
+            current[fieldPath[fieldPath.length - 1]] = value;
+        }
+    }
+
+    // Function to remove a field from the map and clean up empty parent objects
+    function removeField(field) {
+        if (!sub_map_fields.hasOwnProperty(field)) {
+            delete send_data[field];
+        } else {
+            const fieldPath = sub_map_fields[field];
+            let current = send_data;
+
+            // Traverse to the parent of the field to be deleted
+            for (let i = 0; i < fieldPath.length - 1; i++) {
+                if (current[fieldPath[i]] === undefined) {
+                    return; // Field not found
+                }
+                current = current[fieldPath[i]];
+            }
+
+            // Remove the field
+            delete current[fieldPath[fieldPath.length - 1]];
+
+            // Clean up empty objects
+            function cleanUpEmptyObjects(o) {
+                Object.keys(o).forEach((key) => {
+                    if (
+                        typeof o[key] === "object" &&
+                        o[key] !== null &&
+                        !Array.isArray(o[key])
+                    ) {
+                        if (Object.keys(o[key]).length === 0) {
+                            delete o[key];
+                        } else {
+                            cleanUpEmptyObjects(o[key]);
+                        }
+                    }
+                });
+            }
+
+            cleanUpEmptyObjects(send_data);
+        }
+    }
+
     // Event listener for apply filter button inside each popup
-    function apply_filter(button, field) {
+    function applyFilter(button, field) {
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
-        console.log($(`#${button.attr("data-input-filter-id")}`));
-        console.log(button.attr("data-input-filter-id"));
+        console.log(`${button}`);
         if (inputValue) {
-            send_data[field] = inputValue;
+            addField(field, inputValue);
             // Store input value in local storage
             //localStorage.setItem(`${field}-filter-input-value`, inputValue);
             // Add background color when filter is applied
             button.addClass("filter-applied");
         } else {
-            delete send_data[field];
-
+            removeField(field);
             // Clear input value in local storage
             // localStorage.removeItem(`${field}-filter-input-value`);
             // Add background color when filter is applied
@@ -364,16 +460,16 @@ $(document).ready(function () {
         searchData();
     }
 
-    function modify_date_range(field, value) {
-        if (value) send_data[field] = value;
-        else delete send_data[field];
+    function modifyDateFilter(field, value) {
+        if (value) addField(field, value);
+        else removeField(field);
     }
 
     // Apply changes with the date range to table
     $("#apply-date-filter").click(function () {
         $(this).closest(".popup").hide();
-        modify_date_range("from_time", $("#from-date").val());
-        modify_date_range("to_time", $("#to-date").val());
+        modifyDateFilter("from_time", $("#from-date").val());
+        modifyDateFilter("to_time", $("#to-date").val());
         searchData();
     });
 
@@ -385,8 +481,8 @@ $(document).ready(function () {
     // Function to sort the table
     function sortTable(field, order) {
         table_data.sort((a, b) => {
-            let aValue = a[field];
-            let bValue = b[field];
+            let aValue = getFieldData(a, field);
+            let bValue = getFieldData(b, field);
 
             // Handle empty cells: Treat them as the highest value
             if (order == "desc") {
