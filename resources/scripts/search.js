@@ -26,7 +26,7 @@ function togglePopup(button, popup) {
 $(document).ready(function () {
     // Set variables for the code
     let fields = [];
-    let visibleFields = new Set();
+    let visibleFields = new Set(["id", "email_datetime", "sender", "recipients", "subject", "final_verdict"]);
     let send_data = {};
     let table_data = "";
     let sub_map_fields = {};
@@ -140,9 +140,9 @@ $(document).ready(function () {
 
         data.forEach((email) => extractKeys(email));
 
-        fields = Array.from(keysMap.keys());
+        fields = new Set(keysMap.keys());
 
-        visibleFields = new Set(fields);
+        visibleFields = new Set([...visibleFields].filter(item => fields.has(item)));
         populateSortableList();
     }
 
@@ -299,7 +299,11 @@ $(document).ready(function () {
         table_data.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
-                $row.append($("<td>").text(getFieldData(email, field)));
+                cell_text = getFieldData(email, field);
+
+                if (field === "recipients" && email[field].length > 1)
+                    cell_text = `${email[field][0]} and ${email[field].length - 1} more`
+                $row.append($("<td>").text(cell_text));
             });
             $table_body.append($row);
         });
