@@ -22,11 +22,34 @@ function togglePopup(button, popup) {
     }
 }
 
+// Function to format date and time as yyyy-mm-ddThh:mm
+function formatDateTime(date) {
+    const pad = (n) => (n < 10 ? "0" + n : n);
+    return (
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate()) +
+        " " +
+        pad(date.getHours()) +
+        ":" +
+        pad(date.getMinutes())
+    );
+}
+
 // Main function for the search page
 $(document).ready(function () {
     // Set variables for the code
     let fields = [];
-    let visibleFields = new Set(["id", "email_datetime", "sender", "recipients", "subject", "final_verdict"]);
+    let visibleFields = new Set([
+        "id",
+        "email_datetime",
+        "sender",
+        "recipients",
+        "subject",
+        "final_verdict",
+    ]);
     let send_data = {};
     let table_data = "";
     let sub_map_fields = {};
@@ -142,7 +165,9 @@ $(document).ready(function () {
 
         fields = new Set(keysMap.keys());
 
-        visibleFields = new Set([...visibleFields].filter(item => fields.has(item)));
+        visibleFields = new Set(
+            [...visibleFields].filter((item) => fields.has(item))
+        );
         populateSortableList();
     }
 
@@ -302,7 +327,10 @@ $(document).ready(function () {
                 cell_text = getFieldData(email, field);
 
                 if (field === "recipients" && email[field].length > 1)
-                    cell_text = `${email[field][0]} and ${email[field].length - 1} more`
+                    cell_text = `${email[field][0]} and ${
+                        email[field].length - 1
+                    } more`;
+                else if (isDate(cell_text)) cell_text = formatDateTime(new Date(cell_text));
                 $row.append($("<td>").text(cell_text));
             });
             $table_body.append($row);
@@ -446,7 +474,6 @@ $(document).ready(function () {
     // Event listener for apply filter button inside each popup
     function applyFilter(button, field) {
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
-        console.log(`${button}`);
         if (inputValue) {
             addField(field, inputValue);
             // Store input value in local storage
@@ -532,22 +559,6 @@ $(document).ready(function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Function to format date and time as yyyy-mm-ddThh:mm
-    function formatDateTime(date) {
-        const pad = (n) => (n < 10 ? "0" + n : n);
-        return (
-            date.getFullYear() +
-            "-" +
-            pad(date.getMonth() + 1) +
-            "-" +
-            pad(date.getDate()) +
-            "T" +
-            pad(date.getHours()) +
-            ":" +
-            pad(date.getMinutes())
-        );
-    }
-
     // Set max attribute to current date and time
     const now = new Date();
     const maxDateTime = formatDateTime(now);
