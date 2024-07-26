@@ -110,3 +110,17 @@ th {
 .header-button i {
     margin-left: 5px;
 }
+
+.table-responsive {
+    overflow-x: auto;
+    overflow-y: visible; /* Allows popups to be visible above the table */
+    white-space: nowrap; /* Prevent columns from adjusting to screen size */
+}
+
+.table th, .table td {
+    min-width: 150px; /* Adjust the minimum width of your columns as needed */
+}
+
+.table thead th {
+    position: relative; /* Ensures the filter button within the header is positioned correctly */
+}

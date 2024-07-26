@@ -108,6 +108,20 @@ $(document).ready(function () {
         }
     }
 
+    // Get the pretty form for a field header
+    function getPrettyFormat(value) {
+        value_parts = value.split("_");
+        if (value_parts[0] === "analyses") {
+            value_parts.shift();
+            value_parts.push("module", "verdict");
+        } else if (value_parts[0] === "id") {
+            value_parts[0] = "Email ID"
+        }
+        for (let i = 0; i < value_parts.length; i++)
+            value_parts[i] = value_parts[i].charAt(0).toUpperCase() + value_parts[i].slice(1);
+        return value_parts.join(" ");
+    }
+
     // Send to the server a request for a new query
     function searchData() {
         $("#emails_table").empty();
@@ -195,8 +209,10 @@ $(document).ready(function () {
 
             // Add field text
             $("<span/>", {
-                text: field,
+                text: getPrettyFormat(field),
             }).appendTo($headerContent);
+
+            let $headerButtons = $("<div/>", {}).appendTo($headerContent);
 
             // Add filter button
             $("<button/>", {
@@ -208,7 +224,7 @@ $(document).ready(function () {
                 "data-popup-id": `${field}-popup`,
             })
                 .html('<i class="fa-solid fa-filter"></i>')
-                .appendTo($headerContent)
+                .appendTo($headerButtons)
                 .click(function () {
                     togglePopup(
                         $(this),
@@ -270,7 +286,7 @@ $(document).ready(function () {
                                 })
                         )
                 )
-                .appendTo($headerContent);
+                .appendTo($headerButtons);
 
             // Add sorting button
             let $sortButton = $("<button/>", {
@@ -281,7 +297,7 @@ $(document).ready(function () {
                 "data-sort": "asc", // Initial sort state
             })
                 .html('<i class="fas fa-sort"></i>')
-                .appendTo($headerContent);
+                .appendTo($headerButtons);
 
             // Check if this is the currently sorted field
             if (field === currentSortField) {
@@ -348,6 +364,7 @@ $(document).ready(function () {
         fields.forEach((field, index) => {
             let listItem = $("<li>")
                 .addClass("list-group-item")
+                .attr("data-field", field)
                 .attr("data-index", index) // Store original index as data attribute
                 .append(
                     $("<input>", { type: "checkbox", class: "checkbox-column" })
@@ -360,8 +377,8 @@ $(document).ready(function () {
                                 .each(function () {
                                     let fieldName = $(this)
                                         .closest("li")
-                                        .find("span")
-                                        .text();
+                                        .attr("data-field");
+                                    console.log(fieldName);
                                     if ($(this).is(":checked")) {
                                         newVisibleFields.push(fieldName);
                                     }
@@ -371,7 +388,7 @@ $(document).ready(function () {
                             visibleFields = new Set(newVisibleFields);
                         })
                 )
-                .append($("<span>").text(field));
+                .append($("<span>").text(getPrettyFormat(field)));
             sortableList.append(listItem);
         });
     }
@@ -415,6 +432,10 @@ $(document).ready(function () {
 
     // Add or update a field by value
     function addField(field, value) {
+        // Add the filter icon a background to know that its filter is activate
+        // TODO
+        
+        // Add the field to the search request
         const fieldPath = sub_map_fields[field];
         if (!fieldPath) {
             send_data[field] = value;
@@ -434,6 +455,10 @@ $(document).ready(function () {
 
     // Function to remove a field from the map and clean up empty parent objects
     function removeField(field) {
+        // Remove the filter background
+        // TODO
+        
+        // Remove the field from the search request
         if (!sub_map_fields.hasOwnProperty(field)) {
             delete send_data[field];
         } else {
@@ -474,6 +499,7 @@ $(document).ready(function () {
 
     // Event listener for apply filter button inside each popup
     function applyFilter(button, field) {
+        console.log(field);
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
             addField(field, inputValue);
