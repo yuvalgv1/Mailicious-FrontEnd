@@ -330,7 +330,8 @@ $(document).ready(function () {
                     cell_text = `${email[field][0]} and ${
                         email[field].length - 1
                     } more`;
-                else if (isDate(cell_text)) cell_text = formatDateTime(new Date(cell_text));
+                else if (isDate(cell_text))
+                    cell_text = formatDateTime(new Date(cell_text));
                 $row.append($("<td>").text(cell_text));
             });
             $table_body.append($row);
@@ -506,7 +507,11 @@ $(document).ready(function () {
 
     // Helper function to check if a value is a valid Date
     function isDate(value) {
-        return new Date(value) !== "Invalid Date" && !isNaN(new Date(value));
+        return (
+            value !== parseInt(value) &&
+            new Date(value) !== "Invalid Date" &&
+            !isNaN(new Date(value))
+        );
     }
 
     // Function to sort the table
