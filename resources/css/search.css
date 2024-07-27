@@ -35,15 +35,6 @@
     right: 70px;
 }
 
-.filter-button {
-    border-radius: 10%;
-    outline: none;
-}
-
-.filter-applied {
-    background-color: white; /* Adjust color as needed */
-}
-
 .popup {
     display: none; /* Initially hidden */
     border-radius: 10%; /* rounded-circle */
@@ -102,13 +93,18 @@ th {
     position: relative;
 }
 .header-button {
-    background: none;
     border: none;
     padding: 0;
     margin: 0;
 }
+
 .header-button i {
     margin-left: 5px;
+}
+
+.filter-button {
+    border-radius: 20%;
+    outline: none;
 }
 
 .table-responsive {

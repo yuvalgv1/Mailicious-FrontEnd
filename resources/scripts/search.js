@@ -53,6 +53,7 @@ $(document).ready(function () {
     let send_data = {};
     let table_data = "";
     let sub_map_fields = {};
+    let filtered_fields = new Set();
 
     // Variables to track current sort field and order
     let currentSortField = null;
@@ -212,9 +213,12 @@ $(document).ready(function () {
                 text: getPrettyFormat(field),
             }).appendTo($headerContent);
 
-            let $headerButtons = $("<div/>", {}).appendTo($headerContent);
+            let $headerButtons = $("<div/>", {
+                class: "d-flex"
+            }).appendTo($headerContent);
 
             // Add filter button
+            
             $("<button/>", {
                 id: `${field}-filter-button`,
                 type: "button",
@@ -231,6 +235,8 @@ $(document).ready(function () {
                         $(`#${$(this).attr("data-popup-id")}`)
                     );
                 });
+            if (filtered_fields.has(field))
+                $(`#${field}-filter-button`).addClass("bg-white");
 
             $("<div/>", {
                 id: `${field}-popup`,
@@ -433,8 +439,8 @@ $(document).ready(function () {
     // Add or update a field by value
     function addField(field, value) {
         // Add the filter icon a background to know that its filter is activate
-        // TODO
-        
+        filtered_fields.add(field);
+
         // Add the field to the search request
         const fieldPath = sub_map_fields[field];
         if (!fieldPath) {
@@ -456,7 +462,7 @@ $(document).ready(function () {
     // Function to remove a field from the map and clean up empty parent objects
     function removeField(field) {
         // Remove the filter background
-        // TODO
+        filtered_fields.delete(field);
         
         // Remove the field from the search request
         if (!sub_map_fields.hasOwnProperty(field)) {
@@ -499,7 +505,6 @@ $(document).ready(function () {
 
     // Event listener for apply filter button inside each popup
     function applyFilter(button, field) {
-        console.log(field);
         const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
         if (inputValue) {
             addField(field, inputValue);
