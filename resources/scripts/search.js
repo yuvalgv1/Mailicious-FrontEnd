@@ -116,10 +116,12 @@ $(document).ready(function () {
             value_parts.shift();
             value_parts.push("module", "verdict");
         } else if (value_parts[0] === "id") {
-            value_parts[0] = "Email ID"
+            value_parts[0] = "Email ID";
         }
         for (let i = 0; i < value_parts.length; i++)
-            value_parts[i] = value_parts[i].charAt(0).toUpperCase() + value_parts[i].slice(1);
+            value_parts[i] =
+                value_parts[i].charAt(0).toUpperCase() +
+                value_parts[i].slice(1);
         return value_parts.join(" ");
     }
 
@@ -214,11 +216,11 @@ $(document).ready(function () {
             }).appendTo($headerContent);
 
             let $headerButtons = $("<div/>", {
-                class: "d-flex"
+                class: "d-flex",
             }).appendTo($headerContent);
 
             // Add filter button
-            
+
             $("<button/>", {
                 id: `${field}-filter-button`,
                 type: "button",
@@ -463,7 +465,7 @@ $(document).ready(function () {
     function removeField(field) {
         // Remove the filter background
         filtered_fields.delete(field);
-        
+
         // Remove the field from the search request
         if (!sub_map_fields.hasOwnProperty(field)) {
             delete send_data[field];
@@ -528,12 +530,22 @@ $(document).ready(function () {
         else removeField(field);
     }
 
-    // Apply changes with the date range to table
-    $("#apply-date-filter").click(function () {
-        $(this).closest(".popup").hide();
+    function applyDateFilter(button) {
+        button.closest(".popup").hide();
         modifyDateFilter("from_time", $("#from-date").val());
         modifyDateFilter("to_time", $("#to-date").val());
         searchData();
+    }
+
+    // Apply changes with the date range to table
+    $("#apply-date-filter").click(function() {
+        applyDateFilter($(this));
+    });
+
+    $("#clear-date-filter").click(function() {
+        $("#from-date").val("");
+        $("#to-date").val("");
+        applyDateFilter($(this))
     });
 
     // Helper function to check if a value is a valid Date

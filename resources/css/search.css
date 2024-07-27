@@ -35,6 +35,14 @@
     right: 70px;
 }
 
+#clear-date-filter:hover {
+    background: #e2e1e1;
+}
+
+#clear-date-filter:active {
+    background: #b5b5b5;
+}
+
 .popup {
     display: none; /* Initially hidden */
     border-radius: 10%; /* rounded-circle */
