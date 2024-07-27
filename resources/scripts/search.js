@@ -378,22 +378,7 @@ $(document).ready(function () {
                     $("<input>", { type: "checkbox", class: "checkbox-column" })
                         .prop("checked", visibleFields.has(field))
                         .change(function () {
-                            // Update the temporary array based on current checkbox states
-                            let newVisibleFields = [];
-                            sortableList
-                                .find(".checkbox-column")
-                                .each(function () {
-                                    let fieldName = $(this)
-                                        .closest("li")
-                                        .attr("data-field");
-                                    console.log(fieldName);
-                                    if ($(this).is(":checked")) {
-                                        newVisibleFields.push(fieldName);
-                                    }
-                                });
-
-                            // Update visibleFields to the new order
-                            visibleFields = new Set(newVisibleFields);
+                            updateVisibleFields();
                         })
                 )
                 .append($("<span>").text(getPrettyFormat(field)));
@@ -415,6 +400,52 @@ $(document).ready(function () {
             visibleFields = newVisibleFields;
         },
     });
+
+    // Filter columns based on search input
+    $("#column-search").on("input", function () {
+        let searchText = $(this).val().toLowerCase();
+        $("#sortable-columns li").each(function () {
+            let fieldText = $(this).text().toLowerCase();
+            if (fieldText.includes(searchText)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+        updateSelectAllCheckbox();
+    });
+
+    // Update visible fields based on checkbox states
+    function updateVisibleFields() {
+        let newVisibleFields = [];
+        $("#sortable-columns .checkbox-column").each(function () {
+            let fieldName = $(this).closest("li").attr("data-field");
+            if ($(this).is(":checked")) {
+                newVisibleFields.push(fieldName);
+            }
+        });
+        visibleFields = new Set(newVisibleFields);
+        updateSelectAllCheckbox();
+    }
+
+    // Handle select all checkbox change
+    $("#select-all-columns").change(function () {
+        let isChecked = $(this).is(":checked");
+        $("#sortable-columns li:visible .checkbox-column").prop(
+            "checked",
+            isChecked
+        );
+        updateVisibleFields();
+    });
+
+    // Update select all checkbox state
+    function updateSelectAllCheckbox() {
+        let allChecked =
+            $("#sortable-columns li:visible .checkbox-column:checked")
+                .length ===
+            $("#sortable-columns li:visible .checkbox-column").length;
+        $("#select-all-columns").prop("checked", allChecked);
+    }
 
     // Event listener for table customization button
     $(".has-popup").click(function () {
@@ -538,14 +569,14 @@ $(document).ready(function () {
     }
 
     // Apply changes with the date range to table
-    $("#apply-date-filter").click(function() {
+    $("#apply-date-filter").click(function () {
         applyDateFilter($(this));
     });
 
-    $("#clear-date-filter").click(function() {
+    $("#clear-date-filter").click(function () {
         $("#from-date").val("");
         $("#to-date").val("");
-        applyDateFilter($(this))
+        applyDateFilter($(this));
     });
 
     // Helper function to check if a value is a valid Date
