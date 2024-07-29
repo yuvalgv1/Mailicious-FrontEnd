@@ -76,11 +76,11 @@
     overflow-y: auto; /* Add scrolling if the content exceeds max height */
 }
 
-#sortable-columns {
+#columns {
     padding-left: 0;
 }
 
-#sortable-columns li {
+#columns li {
     cursor: move;
     align-items: center;
     justify-content: space-between;

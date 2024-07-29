@@ -41,6 +41,7 @@ function formatDateTime(date) {
 // Main function for the search page
 $(document).ready(function () {
     // Set variables for the code
+    // Handle fields for the table
     let fields = [];
     let visibleFields = new Set([
         "id",
@@ -50,10 +51,11 @@ $(document).ready(function () {
         "subject",
         "final_verdict",
     ]);
-    let send_data = {};
-    let table_data = "";
-    let sub_map_fields = {};
-    let filtered_fields = new Set();
+    let sendData = {};
+    let tableData = "";
+    let subMapFields = {};
+    let filteredFields = new Set();
+    let valuesToFilter = {};
 
     // Variables to track current sort field and order
     let currentSortField = null;
@@ -79,10 +81,10 @@ $(document).ready(function () {
     $("#search-input").keypress(function (event) {
         if (event.which === 13) {
             if ($(this).val() != "") {
-                send_data["text"] = $(this).val();
+                sendData["text"] = $(this).val();
                 searchData();
             } else {
-                delete send_data["text"];
+                delete sendData["text"];
                 searchData();
             }
         }
@@ -92,8 +94,8 @@ $(document).ready(function () {
     function getFieldData(email, field) {
         if (email[field]) {
             return email[field];
-        } else if (sub_map_fields.hasOwnProperty(field)) {
-            const fieldPath = sub_map_fields[field];
+        } else if (subMapFields.hasOwnProperty(field)) {
+            const fieldPath = subMapFields[field];
             let current = email;
 
             for (let i = 0; i < fieldPath.length; i++) {
@@ -111,18 +113,17 @@ $(document).ready(function () {
 
     // Get the pretty form for a field header
     function getPrettyFormat(value) {
-        value_parts = value.split("_");
-        if (value_parts[0] === "analyses") {
-            value_parts.shift();
-            value_parts.push("module", "verdict");
-        } else if (value_parts[0] === "id") {
-            value_parts[0] = "Email ID";
+        valueParts = value.split("_");
+        if (valueParts[0] === "analyses") {
+            valueParts.shift();
+            valueParts.push("module", "verdict");
+        } else if (valueParts[0] === "id") {
+            valueParts[0] = "Email ID";
         }
-        for (let i = 0; i < value_parts.length; i++)
-            value_parts[i] =
-                value_parts[i].charAt(0).toUpperCase() +
-                value_parts[i].slice(1);
-        return value_parts.join(" ");
+        for (let i = 0; i < valueParts.length; i++)
+            valueParts[i] =
+                valueParts[i].charAt(0).toUpperCase() + valueParts[i].slice(1);
+        return valueParts.join(" ");
     }
 
     // Send to the server a request for a new query
@@ -133,11 +134,11 @@ $(document).ready(function () {
             url: "/search",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify(send_data),
+            data: JSON.stringify(sendData),
             success: function (response) {
                 $("#error_message").text("");
-                table_data = response;
-                if (fields.length === 0) setFields(table_data);
+                tableData = response;
+                if (fields.length === 0) setFields(tableData);
                 buildTable();
             },
             error: function (res) {
@@ -170,7 +171,7 @@ $(document).ready(function () {
                     const valueType = typeof obj[key];
                     keysMap.set(fullKey, valueType);
                     if (parentKey) {
-                        sub_map_fields[fullKey] = parentKey
+                        subMapFields[fullKey] = parentKey
                             .split("_")
                             .concat(key);
                     }
@@ -185,6 +186,10 @@ $(document).ready(function () {
         visibleFields = new Set(
             [...visibleFields].filter((item) => fields.has(item))
         );
+
+        // Create the list in the filters popups
+        visibleFields.forEach((field) => {});
+
         populateSortableList();
     }
 
@@ -226,7 +231,6 @@ $(document).ready(function () {
                 type: "button",
                 class: "btn btn-sm filter-button header-button has-popup",
                 title: "Filter Column",
-                "data-field": field,
                 "data-popup-id": `${field}-popup`,
             })
                 .html('<i class="fa-solid fa-filter"></i>')
@@ -237,7 +241,7 @@ $(document).ready(function () {
                         $(`#${$(this).attr("data-popup-id")}`)
                     );
                 });
-            if (filtered_fields.has(field))
+            if (filteredFields.has(field))
                 $(`#${field}-filter-button`).addClass("bg-white");
 
             $("<div/>", {
@@ -248,7 +252,7 @@ $(document).ready(function () {
                     $("<div/>", {
                         class: "popup-header",
                     })
-                        .append($("<span/>").text("Field Contains:"))
+                        .append($("<span/>").text("Filter field:"))
                         .append(
                             $("<button/>", {
                                 class: "close-popup",
@@ -266,31 +270,47 @@ $(document).ready(function () {
                         .append(
                             $("<input/>", {
                                 type: "text",
-                                id: `${field}-filter-input`,
-                                class: "form-control",
-                                "data-button-filter-id": `apply-filter-${field}`,
-                            }).keypress(function (event) {
-                                if (event.which === 13) {
-                                    applyFilter(
-                                        $(
-                                            `#${$(this).attr(
-                                                "data-button-filter-id"
-                                            )}`
-                                        ),
-                                        field
-                                    );
-                                }
+                                id: `${field}-search`,
+                                class: "form-control mb-2",
+                                placeholder: "Search for values...",
+                            }).on("input", function () {
+                                searchValuesInList(field);
+                            })
+                        )
+                        .append(
+                            $("<div/>", {
+                                class: "form-check mb-2",
+                            })
+                                .append(
+                                    $("<input/>", {
+                                        type: "checkbox",
+                                        class: "form-check-input",
+                                        id: `select-all-${field}`,
+                                    }).change(function () {
+                                        selectAllBoxChange(field);
+                                    })
+                                )
+                                .append(
+                                    $("<label/>", {
+                                        class: "form-check-label",
+                                        for: `select-all-${field}`,
+                                    }).text("Select All")
+                                )
+                        )
+                        .append(
+                            $("<ul/>", {
+                                id: `${field}-list`,
+                                class: "list-group",
                             })
                         )
                         .append(
                             $("<button/>", {
                                 id: `apply-filter-${field}`,
                                 class: "btn btn-primary mt-2 apply-filter",
-                                "data-input-filter-id": `${field}-filter-input`,
                             })
-                                .text("Apply")
+                                .text("Apply Filter")
                                 .click(function () {
-                                    applyFilter($(this), field);
+                                    applyFilter(field);
                                 })
                         )
                 )
@@ -340,37 +360,129 @@ $(document).ready(function () {
         });
 
         // Add data
-        $table_body = $table.append(
+        $tableBody = $table.append(
             $("<tbody/>", {
                 class: "table-group-divider",
             })
         );
-        table_data.forEach((email) => {
+
+        let tempData = new Map();
+
+        tableData.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
-                cell_text = getFieldData(email, field);
+                // Display data in the table
+                cellText = getFieldData(email, field);
 
                 if (field === "recipients" && email[field].length > 1)
-                    cell_text = `${email[field][0]} and ${
+                    cellText = `${email[field][0]} and ${
                         email[field].length - 1
                     } more`;
-                else if (isDate(cell_text))
-                    cell_text = formatDateTime(new Date(cell_text));
-                $row.append($("<td>").text(cell_text));
+                else if (isDate(cellText))
+                    cellText = formatDateTime(new Date(cellText));
+                $row.append($("<td>").text(cellText));
+
+                // Temporarly create a set for every value in a field
+                if (!tempData[field]) tempData[field] = new Set();
+                tempData[field].add(cellText);
             });
-            $table_body.append($row);
+            $tableBody.append($row);
         });
+
+        // Using tempData, create the list in the filter popups
+        for (let fieldName in tempData) {
+            let fieldSet = tempData[fieldName];
+            fieldSet.forEach((value) => {
+                let listItem = $("<li/>")
+                    .addClass("list-group-item")
+                    .attr("data-value", value)
+                    .append(
+                        $("<input>", {
+                            type: "checkbox",
+                            class: "checkbox-column",
+                        })
+                            .prop("checked", fieldSet.has(value))
+                            .change(function () {
+                                updateVisibleEntries(fieldName);
+                            })
+                    )
+                    .append($("<span>").text(value));
+                $(`#${fieldName}-list`).append(listItem);
+            });
+            updateSelectAllCheckbox(fieldName);
+        }
 
         // Remove the loading message
         removeLoading();
     }
 
+    // Update visible fields based on checkbox states
+    function updateVisibleEntries(checklistID) {
+        if (checklistID === "columns") {
+            let newVisibleFields = [];
+            $(`#${checklistID}-list .checkbox-column`).each(function () {
+                let fieldName = $(this).closest("li").attr("data-field");
+                if ($(this).is(":checked")) {
+                    newVisibleFields.push(fieldName);
+                }
+            });
+            visibleFields = new Set(newVisibleFields);
+        } else {
+            let newVisibleValues = [];
+            $(`#${checklistID}-list .checkbox-column`).each(function () {
+                let value = $(this).closest("li").attr("data-value");
+                if ($(this).is(":checked")) {
+                    newVisibleValues.push(value);
+                }
+            });
+            if (newVisibleValues.length > 0)
+                valuesToFilter[checklistID] = newVisibleValues;
+            else delete valuesToFilter[checklistID];
+        }
+
+        updateSelectAllCheckbox(checklistID);
+    }
+
+    // Handle select all checkbox change
+    function selectAllBoxChange(checklistID) {
+        let isChecked = $(`#select-all-${checklistID}`).is(":checked");
+        $(`#${checklistID}-list li:visible .checkbox-column`).prop(
+            "checked",
+            isChecked
+        );
+        updateVisibleEntries(checklistID);
+    }
+
+    // Update select all checkbox state
+    function updateSelectAllCheckbox(checklistID) {
+        let allChecked =
+            $(`#${checklistID}-list li:visible .checkbox-column:checked`)
+                .length ===
+            $(`#${checklistID}-list li:visible .checkbox-column`).length;
+        $(`#select-all-${checklistID}`).prop("checked", allChecked);
+    }
+
+    // Filter values based on search input
+    function searchValuesInList(checklistID) {
+        $searchInput = $(`#${checklistID}-search`);
+        let searchText = $searchInput.val().toLowerCase();
+        $(`#${checklistID}-list li`).each(function () {
+            let fieldText = $(this).text().toLowerCase();
+            if (fieldText.includes(searchText)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+        updateSelectAllCheckbox(checklistID);
+    }
+
     // Populate sortable list with columns
     function populateSortableList() {
-        let sortableList = $("#sortable-columns");
+        let sortableList = $("#columns-list");
         sortableList.empty();
         fields.forEach((field, index) => {
-            let listItem = $("<li>")
+            let listItem = $("<li/>")
                 .addClass("list-group-item")
                 .attr("data-field", field)
                 .attr("data-index", index) // Store original index as data attribute
@@ -378,7 +490,7 @@ $(document).ready(function () {
                     $("<input>", { type: "checkbox", class: "checkbox-column" })
                         .prop("checked", visibleFields.has(field))
                         .change(function () {
-                            updateVisibleFields();
+                            updateVisibleEntries("columns");
                         })
                 )
                 .append($("<span>").text(getPrettyFormat(field)));
@@ -386,8 +498,13 @@ $(document).ready(function () {
         });
     }
 
+    // Handle pressing on the select all button on the column order popup
+    $("#select-all-columns").change(function () {
+        selectAllBoxChange("columns");
+    });
+
     // Initialize sortable
-    $("#sortable-columns").sortable({
+    $("#columns-list").sortable({
         placeholder: "sortable-placeholder",
         update: function (event, ui) {
             // Reorder fields array based on new order
@@ -402,50 +519,9 @@ $(document).ready(function () {
     });
 
     // Filter columns based on search input
-    $("#column-search").on("input", function () {
-        let searchText = $(this).val().toLowerCase();
-        $("#sortable-columns li").each(function () {
-            let fieldText = $(this).text().toLowerCase();
-            if (fieldText.includes(searchText)) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
-        updateSelectAllCheckbox();
+    $("#columns-search").on("input", function () {
+        searchValuesInList("columns");
     });
-
-    // Update visible fields based on checkbox states
-    function updateVisibleFields() {
-        let newVisibleFields = [];
-        $("#sortable-columns .checkbox-column").each(function () {
-            let fieldName = $(this).closest("li").attr("data-field");
-            if ($(this).is(":checked")) {
-                newVisibleFields.push(fieldName);
-            }
-        });
-        visibleFields = new Set(newVisibleFields);
-        updateSelectAllCheckbox();
-    }
-
-    // Handle select all checkbox change
-    $("#select-all-columns").change(function () {
-        let isChecked = $(this).is(":checked");
-        $("#sortable-columns li:visible .checkbox-column").prop(
-            "checked",
-            isChecked
-        );
-        updateVisibleFields();
-    });
-
-    // Update select all checkbox state
-    function updateSelectAllCheckbox() {
-        let allChecked =
-            $("#sortable-columns li:visible .checkbox-column:checked")
-                .length ===
-            $("#sortable-columns li:visible .checkbox-column").length;
-        $("#select-all-columns").prop("checked", allChecked);
-    }
 
     // Event listener for table customization button
     $(".has-popup").click(function () {
@@ -472,14 +548,14 @@ $(document).ready(function () {
     // Add or update a field by value
     function addField(field, value) {
         // Add the filter icon a background to know that its filter is activate
-        filtered_fields.add(field);
+        filteredFields.add(field);
 
         // Add the field to the search request
-        const fieldPath = sub_map_fields[field];
+        const fieldPath = subMapFields[field];
         if (!fieldPath) {
-            send_data[field] = value;
+            sendData[field] = value;
         } else {
-            let current = send_data;
+            let current = sendData;
 
             for (let i = 0; i < fieldPath.length - 1; i++) {
                 if (!current[fieldPath[i]]) {
@@ -495,14 +571,14 @@ $(document).ready(function () {
     // Function to remove a field from the map and clean up empty parent objects
     function removeField(field) {
         // Remove the filter background
-        filtered_fields.delete(field);
+        filteredFields.delete(field);
 
         // Remove the field from the search request
-        if (!sub_map_fields.hasOwnProperty(field)) {
-            delete send_data[field];
+        if (!subMapFields.hasOwnProperty(field)) {
+            delete sendData[field];
         } else {
-            const fieldPath = sub_map_fields[field];
-            let current = send_data;
+            const fieldPath = subMapFields[field];
+            let current = sendData;
 
             // Traverse to the parent of the field to be deleted
             for (let i = 0; i < fieldPath.length - 1; i++) {
@@ -532,25 +608,24 @@ $(document).ready(function () {
                 });
             }
 
-            cleanUpEmptyObjects(send_data);
+            cleanUpEmptyObjects(sendData);
         }
     }
 
     // Event listener for apply filter button inside each popup
-    function applyFilter(button, field) {
-        const inputValue = $(`#${button.attr("data-input-filter-id")}`).val();
+    function applyFilter(field) {
+        const inputValue = valuesToFilter[field];
+        $button = $(`#${field}-filter-button`);
         if (inputValue) {
             addField(field, inputValue);
-            // Store input value in local storage
-            //localStorage.setItem(`${field}-filter-input-value`, inputValue);
+
             // Add background color when filter is applied
-            button.addClass("filter-applied");
+            $button.addClass("filter-applied");
         } else {
             removeField(field);
-            // Clear input value in local storage
-            // localStorage.removeItem(`${field}-filter-input-value`);
+
             // Add background color when filter is applied
-            button.removeClass("filter-applied");
+            $button.removeClass("filter-applied");
         }
         $(this).closest(".popup").hide();
         searchData();
@@ -590,7 +665,7 @@ $(document).ready(function () {
 
     // Function to sort the table
     function sortTable(field, order) {
-        table_data.sort((a, b) => {
+        tableData.sort((a, b) => {
             let aValue = getFieldData(a, field);
             let bValue = getFieldData(b, field);
 
