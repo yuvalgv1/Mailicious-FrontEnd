@@ -15,8 +15,8 @@ function search(req, res) {
 }
 
 // Render the data rules page
-function rules(req, res) {
-    res.render("rules")
+function policy(req, res) {
+    res.render("policy")
 }
 
 // Render the data alerts page
@@ -33,7 +33,7 @@ module.exports = {
     loginForm,
     home,
     search,
-    rules,
+    policy,
     alerts,
     settings
 };
