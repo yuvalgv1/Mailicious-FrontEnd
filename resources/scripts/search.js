@@ -384,7 +384,11 @@ $(document).ready(function () {
 
                 // Temporarly create a set for every value in a field
                 if (!tempData[field]) tempData[field] = new Set();
-                tempData[field].add(cellText);
+                if (field === "recipients") {
+                    email[field].forEach((recipient) => {
+                        tempData[field].add(recipient);
+                    })
+                } else tempData[field].add(cellText);
             });
             $tableBody.append($row);
         });
