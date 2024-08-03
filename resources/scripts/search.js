@@ -389,7 +389,7 @@ $(document).ready(function () {
                 if (field === "recipients") {
                     email[field].forEach((recipient) => {
                         tempData[field].add(recipient);
-                    })
+                    });
                 } else tempData[field].add(cellText);
             });
             $tableBody.append($row);
@@ -665,11 +665,7 @@ $(document).ready(function () {
         console.log(value !== parseInt(value));
         console.log(new Date(value));
         console.log(!isNaN(new Date(value)));
-        return (
-            value !== parseInt(value) &&
-            new Date(value) !== "Invalid Date" &&
-            !isNaN(new Date(value))
-        );
+        return value !== parseInt(value) && !isNaN(new Date(value).getTime());
     }
 
     // Function to sort the table
