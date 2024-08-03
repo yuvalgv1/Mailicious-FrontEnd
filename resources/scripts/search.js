@@ -92,7 +92,9 @@ $(document).ready(function () {
 
     // Get the data in an email using the custom fields
     function getFieldData(email, field) {
+        console.log(email[field]);
         if (email[field]) {
+            console.log("ok");
             return email[field];
         } else if (subMapFields.hasOwnProperty(field)) {
             const fieldPath = subMapFields[field];
@@ -660,6 +662,9 @@ $(document).ready(function () {
 
     // Helper function to check if a value is a valid Date
     function isDate(value) {
+        console.log(value !== parseInt(value));
+        console.log(new Date(value) !== "Invalid Date");
+        console.log(!isNaN(new Date(value)));
         return (
             value !== parseInt(value) &&
             new Date(value) !== "Invalid Date" &&
