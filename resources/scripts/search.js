@@ -662,10 +662,17 @@ $(document).ready(function () {
 
     // Helper function to check if a value is a valid Date
     function isDate(value) {
-        console.log(value !== parseInt(value));
-        console.log(new Date(value));
-        console.log(!isNaN(new Date(value)));
-        return value !== parseInt(value) && !isNaN(new Date(value).getTime());
+        // Regular expression for the ISO 8601 format (YYYY-MM-DDTHH:mm:ss.ssssss)
+        const iso8601Format = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+$/;
+
+        // Check if the value matches the ISO 8601 format regex
+        if (!iso8601Format.test(value)) {
+            return false;
+        }
+
+        // Check if the value is a valid date
+        const date = new Date(value);
+        return !isNaN(date.getTime());
     }
 
     // Function to sort the table
