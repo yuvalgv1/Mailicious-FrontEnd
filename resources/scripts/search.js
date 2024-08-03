@@ -487,7 +487,7 @@ $(document).ready(function () {
         sortableList.empty();
         fields.forEach((field, index) => {
             let listItem = $("<li/>")
-                .addClass("list-group-item")
+                .addClass("list-group-item order-column-item")
                 .attr("data-field", field)
                 .attr("data-index", index) // Store original index as data attribute
                 .append(

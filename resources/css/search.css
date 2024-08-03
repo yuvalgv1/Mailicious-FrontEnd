@@ -97,6 +97,10 @@
     margin-right: 10px;
 }
 
+.order-column-item {
+    cursor: pointer;
+}
+
 th {
     position: relative;
 }
