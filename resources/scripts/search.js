@@ -92,9 +92,7 @@ $(document).ready(function () {
 
     // Get the data in an email using the custom fields
     function getFieldData(email, field) {
-        console.log(email[field]);
         if (email[field]) {
-            console.log("ok");
             return email[field];
         } else if (subMapFields.hasOwnProperty(field)) {
             const fieldPath = subMapFields[field];
