@@ -663,7 +663,7 @@ $(document).ready(function () {
     // Helper function to check if a value is a valid Date
     function isDate(value) {
         console.log(value !== parseInt(value));
-        console.log(new Date(value) !== "Invalid Date");
+        console.log(new Date(value));
         console.log(!isNaN(new Date(value)));
         return (
             value !== parseInt(value) &&
