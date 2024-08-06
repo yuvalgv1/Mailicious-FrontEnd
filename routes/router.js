@@ -22,5 +22,6 @@ router.get("/settings", usersController.isLoggedIn, pagesController.settings);
 
 // Actions Controller
 router.post("/search", actionsontroller.search);
+router.get("/enum_modules", actionsontroller.modules);
 
 module.exports = router;

@@ -143,10 +143,8 @@ $(document).ready(function () {
             },
             error: function (res) {
                 if (res.status == 401) window.location.href = "/login";
-                if (res.responseJSON && res.responseJSON.error) {
+                if (res.responseJSON && res.responseJSON.error)
                     $("#error_message").text(res.responseJSON.error);
-                    $("#error_message").addClass("");
-                }
                 removeLoading();
             },
         });
