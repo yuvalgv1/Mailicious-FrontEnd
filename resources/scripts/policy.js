@@ -7,6 +7,14 @@ $(document).ready(function () {
     const mainPolicyID = 1;
     const benignID = 1;
     let changesMade = {};
+    let changedModules = [];
+
+    // Blacklist module variables
+    const blacklistID = 3;
+    let blacklists = [];
+    let blacklistFields = [];
+    let addToBlacklist = [];
+    let removeFromBlacklist = [];
 
     const $modulesTable = $("#modules_table tbody");
 
@@ -25,6 +33,22 @@ $(document).ready(function () {
     // Remove the loading Data text
     function removeLoading() {
         $("#loading-message").html("");
+    }
+
+    // Change state of the apply changes button.
+    function enableApplyChangesButton() {
+        $("#apply-changes")
+            .removeClass("btn-secondary")
+            .addClass("btn-primary")
+            .prop("disabled", false);
+    }
+
+    // Change state of the apply changes button.
+    function disableApplyChangesButton() {
+        $("#apply-changes")
+            .addClass("btn-secondary")
+            .removeClass("btn-primary")
+            .prop("disabled", true);
     }
 
     // Load the modules list from the server
@@ -150,7 +174,9 @@ $(document).ready(function () {
             }
 
             // Add an expantion row below each row
-            let $exp = $("<tr>");
+            let $exp = $("<tr>", {
+                id: `policy-row-${module.id}`,
+            });
             $row.after($exp);
 
             // For modules, add an extra class
@@ -218,7 +244,6 @@ $(document).ready(function () {
                             .appendTo($tableBody);
                     }
                 });
-
             });
         });
 
@@ -248,10 +273,7 @@ $(document).ready(function () {
             // If there are no changes made to this button yet add it to the changed buttons
             if (!currentAction) {
                 changesMade[currentActionID] = { ...originalAction };
-                $("#apply-changes")
-                    .removeClass("btn-secondary")
-                    .addClass("btn-primary")
-                    .prop("disabled", false);
+                enableApplyChangesButton();
             }
             // Change the state of the action that we are on
             if (currentActionType === "block")
@@ -268,62 +290,99 @@ $(document).ready(function () {
             ) {
                 delete changesMade[currentActionID];
                 if (Object.keys(changesMade).length === 0)
-                    $("#apply-changes")
-                        .addClass("btn-secondary")
-                        .removeClass("btn-primary")
-                        .prop("disabled", true);
+                    disableApplyChangesButton();
             }
         });
 
+        function loadExtentions() {
+            function blacklistExt() {
+                const $policyRow = $(`#policy-row-${blacklistID}`);
+
+                // Add a seperator line
+                $policyRow.append($("<hr/>", { class: "bg-white" }));
+
+                // Add a table where each row has a list for this module
+            }
+
+            blacklistExt();
+        }
+
         // Apply the changes of the changed policy
         $("#apply-changes").click(function () {
-            // Extract a list of the changes
+            // Handle the toggle action (on/off) for the module by sending the server the update
+            if (changedModules.length > 0)
+                $.ajax({
+                    url: "/modules/toggle",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(changedModules),
+                    success: function (res) {
+                        // Add a success message
+                        $("#success-message").text(
+                            "Policy updated successfully"
+                        );
+
+                        // Reset the list of modules and the apply button
+                        changedModules = [];
+                        disableApplyChangesButton();
+                    },
+                    error: function (res) {
+                        if (res.status == 401) {
+                            window.location.href = "/login";
+                        }
+                        if (res.responseJSON && res.responseJSON.error) {
+                            $("#error_message").text(res.responseJSON.error);
+                        }
+                    },
+                });
+
+            // Send to the server the changes in the actions
             listOfUpdatedObjects = Object.values(changesMade);
+            if (listOfUpdatedObjects.length > 0)
+                $.ajax({
+                    url: "/actions",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(listOfUpdatedObjects),
+                    success: function (res) {
+                        // Load the changes locally to enable a continuation
+                        let newActions = [];
+                        actions.forEach((act) => {
+                            if (changesMade[act.id])
+                                newActions.push(changesMade[act.id]);
+                            else newActions.push(act);
+                        });
+                        actions = [...newActions];
 
-            // Send to the server the changes
-            $.ajax({
-                url: "/actions",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(listOfUpdatedObjects),
-                success: function (res) {
-                    // Load the changes locally to enable a continuation
-                    let newActions = [];
-                    actions.forEach((act) => {
-                        if (changesMade[act.id])
-                            newActions.push(changesMade[act.id]);
-                        else newActions.push(act);
-                    });
-                    actions = [...newActions];
+                        // Add a success message
+                        $("#success-message").text(
+                            "Policy updated successfully"
+                        );
 
-                    // Add a success message
-                    $("#success-message").text("Policy updated successfully");
+                        // Reset the list of changes made and the button
+                        changesMade = {};
+                        disableApplyChangesButton();
+                    },
+                    error: function (res) {
+                        if (res.status == 401) {
+                            window.location.href = "/login";
+                        }
+                        if (res.responseJSON && res.responseJSON.error) {
+                            $("#error_message").text(res.responseJSON.error);
+                        }
+                    },
+                });
 
-                    // Reset the list of changes made and the button
-                    changesMade = {};
-                    $("#apply-changes")
-                        .addClass("btn-secondary")
-                        .removeClass("btn-primary")
-                        .prop("disabled", true);
-                },
-                error: function (res) {
-                    if (res.status == 401) {
-                        window.location.href = "/login";
-                    }
-                    if (res.responseJSON && res.responseJSON.error) {
-                        $("#error_message").text(res.responseJSON.error);
-                    }
-                },
-            });
+            // Handle changes in blacklist module
         });
+
+        // Load every module with an extension
+        loadExtentions();
     }
 
     $modulesTable.on("click", ".toggle-btn", function (e) {
         // Prevent the row click from triggering
         e.stopPropagation();
-
-        // Remove the success message
-        $("#success-message").text("");
 
         const moduleID = parseInt(
             $(this)
@@ -331,26 +390,19 @@ $(document).ready(function () {
                 .substr(togglePrefix.length + 1)
         );
 
-        // Handle the toggle action (on/off) for the module by sending the server the update
-        $.ajax({
-            url: "/modules/toggle",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ id: moduleID }),
-            success: function (res) {
-                // Update the local state
-                currentModule = modules.find((mod) => mod.id === moduleID);
-                currentModule.enabled = !currentModule.enabled;
-            },
-            error: function (res) {
-                if (res.status == 401) {
-                    window.location.href = "/login";
-                }
-                if (res.responseJSON && res.responseJSON.error) {
-                    $("#error_message").text(res.responseJSON.error);
-                }
-            },
-        });
+        if (changedModules.includes(moduleID))
+            changedModules = changedModules.filter((e) => e !== moduleID);
+        else changedModules.push(moduleID);
+
+        // Update the local state
+        currentModule = modules.find((mod) => mod.id === moduleID);
+        currentModule.enabled = !currentModule.enabled;
+
+        // Remove the success message
+        $("#success-message").text("");
+
+        if (changedModules.length === 0) disableApplyChangesButton();
+        else enableApplyChangesButton();
     });
 
     $modulesTable.on("click", ".module-row", function (e) {
