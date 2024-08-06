@@ -234,6 +234,9 @@ $(document).ready(function () {
 
         // Mark checkbox and update state
         $(".action-checkbox").click(function () {
+            // Remove the success message
+            $("#success-message").text("");
+            
             currentActionID = parseInt($(this).attr("data-actionID"));
             currentActionType = $(this).attr("data-actionType");
 
@@ -292,6 +295,9 @@ $(document).ready(function () {
                         else newActions.push(act);
                     });
                     actions = [...newActions];
+
+                    // Add a success message
+                    $("#success-message").text("Policy updated successfully");
 
                     // Reset the list of changes made and the button
                     changesMade = {};
