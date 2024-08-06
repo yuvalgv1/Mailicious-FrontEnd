@@ -236,7 +236,7 @@ $(document).ready(function () {
         $(".action-checkbox").click(function () {
             // Remove the success message
             $("#success-message").text("");
-            
+
             currentActionID = parseInt($(this).attr("data-actionID"));
             currentActionType = $(this).attr("data-actionType");
 
@@ -319,7 +319,12 @@ $(document).ready(function () {
     }
 
     $modulesTable.on("click", ".toggle-btn", function (e) {
-        e.stopPropagation(); // Prevent the row click from triggering
+        // Prevent the row click from triggering
+        e.stopPropagation();
+
+        // Remove the success message
+        $("#success-message").text("");
+
         const moduleID = parseInt(
             $(this)
                 .attr("id")
