@@ -1,91 +1,7 @@
-// Add loading message when waiting for the server to send the data.
-function loadData() {
-    $("#loading-message")
-        .append(" Loading Data...")
-        .append(
-            $("<span/>", {
-                class: "spinner-border spinner-border-sm",
-                role: "status",
-            })
-        );
-}
-
-// Remoev the loading Data text
-function removeLoading() {
-    $("#loading-message").html("");
-}
-
-function loadModules() {
-    // $.ajax({
-    //     url: "/enum_modules",
-    //     type: "GET",
-    //     success: function (response) {
-    //         $("#error_message").text("");
-    //         return response;
-    //     },
-    //     error: function (res) {
-    //         if (res.status == 401) window.location.href = "/login";
-    //         if (res.responseJSON && res.responseJSON.error)
-    //             $("#error_message").text(res.responseJSON.error);
-    //         removeLoading();
-    //     },
-    // });
-    return [
-        {
-            name: "External Data Sources",
-            description: "Detect by External Data Sources",
-            enabled: true,
-            id: 2,
-        },
-        {
-            name: "Blacklist",
-            description: "Detect by blacklist",
-            enabled: true,
-            id: 3,
-        },
-        {
-            name: "Final Verdict",
-            description: "Detect by final verdict",
-            enabled: true,
-            id: 1,
-        },
-    ];
-}
-
-function loadVerdicts() {
-    return [
-        { name: "Benign", description: "This is a benign email.", id: 1 },
-        {
-            name: "Suspicious",
-            description: "This is not a suspicious email.",
-            id: 2,
-        },
-        { name: "Malicious", description: "This is a malicious email.", id: 3 },
-    ];
-}
-
-function loadAction() {
-    return [
-        { id: 1, module_id: 1, verdict_id: 1, block: true, alert: true },
-        { id: 2, module_id: 1, verdict_id: 2, block: false, alert: false },
-        { id: 3, module_id: 1, verdict_id: 3, block: true, alert: false },
-        { id: 4, module_id: 2, verdict_id: 1, block: false, alert: false },
-        { id: 5, module_id: 2, verdict_id: 2, block: false, alert: false },
-        { id: 6, module_id: 2, verdict_id: 3, block: false, alert: false },
-        { id: 7, module_id: 3, verdict_id: 1, block: false, alert: false },
-        { id: 8, module_id: 3, verdict_id: 2, block: false, alert: false },
-        { id: 9, module_id: 3, verdict_id: 3, block: false, alert: false },
-    ];
-}
-
 $(document).ready(function () {
-    loadData();
-    let modules = loadModules();
-    let verdicts = loadVerdicts();
-    let actions = loadAction();
-
-    if (!modules || !verdicts || !actions)
-        $("#error_message").text("Problem with the data retrieved from the server");
+    let modules = [];
+    let verdicts = [];
+    let actions = [];
 
     let togglePrefix = "toggle-btn";
     const mainPolicyID = 1;
@@ -94,7 +10,96 @@ $(document).ready(function () {
 
     const $modulesTable = $("#modules_table tbody");
 
+    // Add loading message when waiting for the server to send the data.
+    function loadingAnimation() {
+        $("#loading-message")
+            .append(" Loading Data...")
+            .append(
+                $("<span/>", {
+                    class: "spinner-border spinner-border-sm",
+                    role: "status",
+                })
+            );
+    }
+
+    // Remove the loading Data text
+    function removeLoading() {
+        $("#loading-message").html("");
+    }
+
+    // Load the modules list from the server
+    function loadModules() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/enum_modules",
+                type: "GET",
+                success: function (res) {
+                    modules = res;
+                    resolve();
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                    reject(res);
+                },
+            });
+        });
+    }
+
+    // Load the verdicts list from the server
+    function loadVerdicts() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/enum_verdicts",
+                type: "GET",
+                success: function (res) {
+                    verdicts = res;
+                    resolve();
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                    reject(res);
+                },
+            });
+        });
+    }
+
+    // Load the actions list from the server
+    function loadAction() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/actions",
+                type: "GET",
+                success: function (res) {
+                    actions = res;
+                    resolve();
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                    reject(res);
+                },
+            });
+        });
+    }
+
     function loadPage() {
+        // Reset the error message
+        $("#error_message").text("");
+
         modules.forEach((module) => {
             // Add the row for each module
             let $row = $("<tr>");
@@ -285,8 +290,6 @@ $(document).ready(function () {
             });
             actions = [...newActions];
         });
-
-        removeLoading();
     }
 
     $modulesTable.on("click", ".toggle-btn", function (e) {
@@ -311,5 +314,18 @@ $(document).ready(function () {
             $(this).next(".module-detail").toggle();
     });
 
-    loadPage();
+    function loadData() {
+        Promise.all([loadModules(), loadVerdicts(), loadAction()])
+            .then(loadPage)
+            .catch((error) => {
+                console.error("Failed to fetch data:", error);
+                $("#error_message").text(
+                    "Problem with the data retrieved from the server"
+                );
+            });
+    }
+
+    loadingAnimation();
+    loadData();
+    removeLoading();
 });
