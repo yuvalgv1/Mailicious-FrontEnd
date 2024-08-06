@@ -231,7 +231,11 @@ $(document).ready(function () {
                 title: "Filter Column",
                 "data-popup-id": `${field}-popup`,
             })
-                .html('<i class="fa-solid fa-filter"></i>')
+                .append(
+                    $("<i/>", {
+                        class: "fa-solid fa-filter",
+                    })
+                )
                 .appendTo($headerButtons)
                 .click(function () {
                     togglePopup(
@@ -240,7 +244,7 @@ $(document).ready(function () {
                     );
                 });
             if (filteredFields.has(field))
-                $(`#${field}-filter-button`).addClass("bg-white");
+                $(`#${field}-filter-button`).addClass("text-primary");
 
             $("<div/>", {
                 id: `${field}-popup`,
@@ -618,17 +622,9 @@ $(document).ready(function () {
     function applyFilter(field) {
         const inputValue = valuesToFilter[field];
         $button = $(`#${field}-filter-button`);
-        if (inputValue) {
-            addField(field, inputValue);
+        if (inputValue) addField(field, inputValue);
+        else removeField(field);
 
-            // Add background color when filter is applied
-            $button.addClass("filter-applied");
-        } else {
-            removeField(field);
-
-            // Add background color when filter is applied
-            $button.removeClass("filter-applied");
-        }
         $(this).closest(".popup").hide();
         searchData();
     }
