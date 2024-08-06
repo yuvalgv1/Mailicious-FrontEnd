@@ -74,7 +74,7 @@ $(document).ready(function () {
     }
 
     // Load the actions list from the server
-    function loadAction() {
+    function loadActions() {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: "/actions",
@@ -182,46 +182,43 @@ $(document).ready(function () {
             let $tableBody = $("<tbody/>").appendTo($verdictTable);
             verdicts.forEach((verdict) => {
                 // find the right action for the current verdict
-                let action = null;
                 actions.forEach((act) => {
                     if (
                         act.module_id == module.id &&
                         act.verdict_id == verdict.id
-                    )
-                        action = act;
+                    ) {
+                        let $actionRow = $("<tr/>").append(
+                            $("<td/>").html(verdict.name)
+                        );
+
+                        if (act.verdict_id !== benignID)
+                            $actionRow.append(
+                                $("<td/>").append(
+                                    $("<input/>", {
+                                        type: "checkbox",
+                                        class: "action-checkbox",
+                                        "data-actionID": act.id,
+                                        "data-actionType": "block",
+                                    }).prop("checked", act.block)
+                                )
+                            );
+                        else $actionRow.append($("<td/>"));
+
+                        $actionRow
+                            .append(
+                                $("<td/>").append(
+                                    $("<input/>", {
+                                        type: "checkbox",
+                                        class: "action-checkbox",
+                                        "data-actionID": act.id,
+                                        "data-actionType": "alert",
+                                    }).prop("checked", act.alert)
+                                )
+                            )
+                            .appendTo($tableBody);
+                    }
                 });
 
-                if (action == null) throw "Can't find matching actions";
-
-                let $actionRow = $("<tr/>").append(
-                    $("<td/>").html(verdict.name)
-                );
-
-                if (action.verdict_id !== benignID)
-                    $actionRow.append(
-                        $("<td/>").append(
-                            $("<input/>", {
-                                type: "checkbox",
-                                class: "action-checkbox",
-                                "data-actionID": action.id,
-                                "data-actionType": "block",
-                            }).prop("checked", action.block)
-                        )
-                    );
-                else $actionRow.append($("<td/>"));
-
-                $actionRow
-                    .append(
-                        $("<td/>").append(
-                            $("<input/>", {
-                                type: "checkbox",
-                                class: "action-checkbox",
-                                "data-actionID": action.id,
-                                "data-actionType": "alert",
-                            }).prop("checked", action.alert)
-                        )
-                    )
-                    .appendTo($tableBody);
             });
         });
 
@@ -328,7 +325,7 @@ $(document).ready(function () {
             url: "/modules/toggle",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({id: moduleID}),
+            data: JSON.stringify({ id: moduleID }),
             success: function (res) {
                 // Update the local state
                 currentModule = modules.find((mod) => mod.id === moduleID);
@@ -352,7 +349,7 @@ $(document).ready(function () {
     });
 
     function loadData() {
-        Promise.all([loadModules(), loadVerdicts(), loadAction()])
+        Promise.all([loadModules(), loadVerdicts(), loadActions()])
             .then(loadPage)
             .catch((error) => {
                 $("#error_message").text(`Failed to fetch data: ${error}`);
