@@ -281,14 +281,37 @@ $(document).ready(function () {
             listOfUpdatedObjects = Object.values(changesMade);
 
             // Send to the server the changes
+            $.ajax({
+                url: "/actions",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(listOfUpdatedObjects),
+                success: function (res) {
+                    // Load the changes locally to enable a continuation
+                    let newActions = [];
+                    actions.forEach((act) => {
+                        if (changesMade[act.id])
+                            newActions.push(changesMade[act.id]);
+                        else newActions.push(act);
+                    });
+                    actions = [...newActions];
 
-            // Load the changes locally to enable a continuation
-            let newActions = [];
-            actions.forEach((act) => {
-                if (changesMade[act.id]) newActions.push(changesMade[act.id]);
-                else newActions.push(act);
+                    // Reset the list of changes made and the button
+                    changesMade = {};
+                    $("#apply-changes")
+                        .addClass("btn-secondary")
+                        .removeClass("btn-primary")
+                        .prop("disabled", true);
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                },
             });
-            actions = [...newActions];
         });
     }
 
@@ -300,12 +323,26 @@ $(document).ready(function () {
                 .substr(togglePrefix.length + 1)
         );
 
-        // Update the local state
-        currentModule = modules.find((mod) => mod.id === moduleID);
-        currentModule.enabled = !currentModule.enabled;
-        console.log(modules);
-
         // Handle the toggle action (on/off) for the module by sending the server the update
+        $.ajax({
+            url: "/modules/toggle",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({id: moduleID}),
+            success: function (res) {
+                // Update the local state
+                currentModule = modules.find((mod) => mod.id === moduleID);
+                currentModule.enabled = !currentModule.enabled;
+            },
+            error: function (res) {
+                if (res.status == 401) {
+                    window.location.href = "/login";
+                }
+                if (res.responseJSON && res.responseJSON.error) {
+                    $("#error_message").text(res.responseJSON.error);
+                }
+            },
+        });
     });
 
     $modulesTable.on("click", ".module-row", function (e) {
@@ -318,10 +355,7 @@ $(document).ready(function () {
         Promise.all([loadModules(), loadVerdicts(), loadAction()])
             .then(loadPage)
             .catch((error) => {
-                console.error("Failed to fetch data:", error);
-                $("#error_message").text(
-                    "Problem with the data retrieved from the server"
-                );
+                $("#error_message").text(`Failed to fetch data: ${error}`);
             });
     }
 

@@ -24,6 +24,8 @@ router.get("/settings", usersController.isLoggedIn, pagesController.settings);
 router.post("/search", actionsontroller.search);
 router.get("/enum_modules", actionsontroller.modules);
 router.get("/enum_verdicts", actionsontroller.verdicts);
-router.get("/actions", actionsontroller.actions);
+router.get("/actions", actionsontroller.getActions);
+router.post("/actions", actionsontroller.updateActions);
+router.post("/modules/toggle", actionsontroller.toggleModule);
 
 module.exports = router;
