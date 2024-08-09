@@ -29,6 +29,5 @@ module.exports = {
     home,
     search,
     policy,
-    alerts,
     settings
 };
