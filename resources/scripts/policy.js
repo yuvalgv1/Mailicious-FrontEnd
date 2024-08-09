@@ -11,8 +11,8 @@ $(document).ready(function () {
 
     // Blacklist module variables
     const blacklistID = 3;
-    let blacklists = [];
-    let blacklistFields = [];
+    let blacklistFields = {};
+    let blacklistsValues = {};
     let addToBlacklist = [];
     let removeFromBlacklist = [];
 
@@ -117,6 +117,36 @@ $(document).ready(function () {
                     reject(res);
                 },
             });
+        });
+    }
+
+    // Load the field list for the blacklist module
+    function loadBlacklistFields() {
+        let fields = [
+            { name: "domain", id: 1 },
+            { name: "subject", id: 2 },
+            { name: "SPF_IP", id: 3 },
+            { name: "country", id: 4 },
+        ];
+
+        fields.forEach((field) => {
+            blacklistFields[field.id] = field.name;
+        });
+    }
+
+    // Load the values to input the blacklist module
+    function loadBlacklistValues() {
+        let fullList = [
+            { id: 0, field_id: 1, value: "test value" },
+            { id: 1, field_id: 0, value: "test value1" },
+            { id: 2, field_id: 0, value: "test value2" },
+        ];
+
+        fullList.forEach((value) => {
+            const { field_id, ...rest } = value;
+            if (!blacklistsValues.has(field_id))
+                blacklistsValues.set(field_id, []);
+            blacklistsValues.get(field_id).push(rest);
         });
     }
 
@@ -412,10 +442,16 @@ $(document).ready(function () {
     });
 
     function loadData() {
-        Promise.all([loadModules(), loadVerdicts(), loadActions()])
+        Promise.all([
+            loadModules(),
+            loadVerdicts(),
+            loadActions(),
+            loadBlacklistFields(),
+            loadBlacklistValues(),
+        ])
             .then(loadPage)
             .catch((error) => {
-                $("#error_message").text(`Failed to fetch data: ${error}`);
+                $("#error_message").text(`Failed to load page: ${error}`);
             });
     }
 

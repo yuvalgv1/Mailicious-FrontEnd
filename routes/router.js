@@ -17,7 +17,6 @@ router.get("/login", usersController.isLoggedIn, pagesController.loginForm);
 router.get("/home", usersController.isLoggedIn, pagesController.home);
 router.get("/search", usersController.isLoggedIn, pagesController.search);
 router.get("/policy", usersController.isLoggedIn, pagesController.policy);
-router.get("/alerts", usersController.isLoggedIn, pagesController.alerts);
 router.get("/settings", usersController.isLoggedIn, pagesController.settings);
 
 // Actions Controller

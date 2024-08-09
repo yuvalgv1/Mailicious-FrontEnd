@@ -19,11 +19,6 @@ function policy(req, res) {
     res.render("policy")
 }
 
-// Render the data alerts page
-function alerts(req, res) {
-    res.render("alerts")
-}
-
 // Render the data settings page
 function settings(req, res) {
     res.render("settings")
