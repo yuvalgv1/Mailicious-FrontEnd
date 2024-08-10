@@ -240,7 +240,7 @@ $(document).ready(function () {
                 .click(function () {
                     togglePopup(
                         $(this),
-                        $(`#${$(this).attr("data-popup-id")}`)
+                        $(`#${$(this).data("popup-id")}`)
                     );
                 });
             if (filteredFields.has(field))
@@ -331,20 +331,20 @@ $(document).ready(function () {
 
             // Check if this is the currently sorted field
             if (field === currentSortField) {
-                $sortButton.attr("data-sort", currentSortOrder);
+                $sortButton.data("sort", currentSortOrder);
                 $sortButton.html(
                     `<i class="fas fa-sort-${
                         currentSortOrder === "asc" ? "up" : "down"
                     }"></i>`
                 );
             } else {
-                $sortButton.attr("data-sort", "asc"); // Default sort order
+                $sortButton.data("sort", "asc"); // Default sort order
             }
 
             $sortButton.click(function () {
                 let $this = $(this);
-                let field = $this.attr("data-field");
-                let currentSort = $this.attr("data-sort");
+                let field = $this.data("field");
+                let currentSort = $this.data("sort");
                 let newSort = currentSort === "asc" ? "desc" : "asc";
 
                 // Update sort indicator
@@ -354,7 +354,7 @@ $(document).ready(function () {
                         newSort === "asc" ? "up" : "down"
                     }"></i>`
                 );
-                $this.attr("data-sort", newSort);
+                $this.data("sort", newSort);
 
                 // Sort table
                 sortTable(field, newSort);
@@ -401,7 +401,7 @@ $(document).ready(function () {
             fieldSet.forEach((value) => {
                 let listItem = $("<li/>")
                     .addClass("list-group-item")
-                    .attr("data-value", value)
+                    .data("value", value)
                     .append(
                         $("<input>", {
                             type: "checkbox",
@@ -427,7 +427,7 @@ $(document).ready(function () {
         if (checklistID === "columns") {
             let newVisibleFields = [];
             $(`#${checklistID}-list .checkbox-column`).each(function () {
-                let fieldName = $(this).closest("li").attr("data-field");
+                let fieldName = $(this).closest("li").data("field");
                 if ($(this).is(":checked")) {
                     newVisibleFields.push(fieldName);
                 }
@@ -436,7 +436,7 @@ $(document).ready(function () {
         } else {
             let newVisibleValues = [];
             $(`#${checklistID}-list .checkbox-column`).each(function () {
-                let value = $(this).closest("li").attr("data-value");
+                let value = $(this).closest("li").data("value");
                 if ($(this).is(":checked")) {
                     newVisibleValues.push(value);
                 }
@@ -490,8 +490,8 @@ $(document).ready(function () {
         fields.forEach((field, index) => {
             let listItem = $("<li/>")
                 .addClass("list-group-item order-column-item")
-                .attr("data-field", field)
-                .attr("data-index", index) // Store original index as data attribute
+                .data("field", field)
+                .data("index", index) // Store original index as data attribute
                 .append(
                     $("<input>", { type: "checkbox", class: "checkbox-column" })
                         .prop("checked", visibleFields.has(field))
@@ -531,7 +531,7 @@ $(document).ready(function () {
 
     // Event listener for table customization button
     $(".has-popup").click(function () {
-        togglePopup($(this), $(`#${$(this).attr("data-popup-id")}`));
+        togglePopup($(this), $(`#${$(this).data("popup-id")}`));
     });
 
     $(".close-popup").click(function () {

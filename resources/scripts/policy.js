@@ -138,17 +138,109 @@ $(document).ready(function () {
     function loadBlacklistValues() {
         let fullList = [
             { id: 0, field_id: 1, value: "test value" },
-            { id: 1, field_id: 0, value: "test value1" },
-            { id: 2, field_id: 0, value: "test value2" },
+            { id: 1, field_id: 2, value: "test value1" },
+            { id: 2, field_id: 2, value: "test value2" },
         ];
 
         fullList.forEach((value) => {
             const { field_id, ...rest } = value;
-            if (!blacklistsValues.has(field_id))
-                blacklistsValues.set(field_id, []);
-            blacklistsValues.get(field_id).push(rest);
+            if (!(field_id in blacklistsValues))
+                blacklistsValues[field_id] = [];
+            blacklistsValues[field_id].push(rest);
         });
     }
+
+    function renderBlacklist(fieldId) {
+        var list = $(`#list-${fieldId}`);
+        list.empty();
+        var valuesInList = blacklistsValues[fieldId];
+        if (valuesInList) {
+            valuesInList.forEach((entry) => {
+                list.append(
+                    $("<li/>", {
+                        class: "list-group-item d-flex justify-content-between align-items-center",
+                        text: entry.value,
+                    }).append(
+                        $("<button/>", {
+                            class: "btn btn-danger btn-sm remove-btn",
+                            text: "Remove",
+                            "data-field-id": fieldId,
+                        })
+                    )
+                );
+            });
+        }
+    }
+
+    // Add new value to the list
+    $(document).on("click", ".add-value-btn", function () {
+        var fieldId = $(this).data("field-id");
+        const newValue = $(`#newListValueInput-${fieldId}`).val().trim();
+
+        // Clear input field
+        $(`#newListValueInput-${fieldId}`).val("");
+
+        if (newValue) {
+            var currentList = blacklistsValues[fieldId];
+
+            // If the value already exists, don't change anything
+            if (!currentList.some((entry) => entry.value === newValue)) {
+                // If the value was removed before changes applied it will bring it back
+                const index = removeFromBlacklist.findIndex(
+                    (obj) => obj.value === newValue
+                );
+
+                // If the value is new, it will be added to the list without id
+                if (index === -1) {
+                    const newEntry = {
+                        value: newValue,
+                        field_id: fieldId,
+                    };
+                    addToBlacklist.push(newEntry);
+                    currentList.push(newEntry);
+                } else {
+                    const [RevivedEntry] = removeFromBlacklist.splice(index, 1);
+                    currentList.push(RevivedEntry);
+                }
+
+                renderBlacklist(fieldId);
+            }
+        }
+    });
+
+    // Remove value from the list
+    $(document).on("click", ".remove-btn", function () {
+        const fieldId = $(this).data("field-id");
+        const removedValue = $(this)
+            .parent()
+            .contents()
+            .filter(function () {
+                return this.nodeType === Node.TEXT_NODE;
+            })
+            .text();
+        var currentList = blacklistsValues[fieldId];
+
+        // Remove the entry from the current list
+        var index = currentList.findIndex((obj) => obj.value === removedValue);
+        const [removedObject] = currentList.splice(index, 1);
+
+        // Remove only objects that exists in the database
+        if (removedObject.hasOwnProperty("id")) {
+            removeFromBlacklist.push(removedObject);
+        }
+
+        // Remove the entry from added values if its a new value
+        index = addToBlacklist.findIndex((obj) => obj.value === removedValue);
+
+        if (index === -1) addToBlacklist.splice(index, 1);
+
+        renderBlacklist(fieldId);
+    });
+
+    // Open list popup when the button is clicked
+    $(document).on("click", ".open-popup-btn", function () {
+        $(`#${$(this).data("modal-id")}`).modal("show");
+    });
 
     function loadPage() {
         // Reset the error message
@@ -288,12 +380,12 @@ $(document).ready(function () {
         );
 
         // Mark checkbox and update state
-        $(".action-checkbox").click(function () {
+        $(document).on("click", ".action-checkbox", function () {
             // Remove the success message
             $("#success-message").text("");
 
-            currentActionID = parseInt($(this).attr("data-actionID"));
-            currentActionType = $(this).attr("data-actionType");
+            currentActionID = parseInt($(this).data("actionID"));
+            currentActionType = $(this).data("actionType");
 
             currentAction = changesMade[currentActionID];
             originalAction = {
@@ -331,9 +423,109 @@ $(document).ready(function () {
                 // Add a seperator line
                 $policyRow.append($("<hr/>", { class: "bg-white" }));
 
-                // Add a table where each row has a list for this module
-            }
+                // Add title
+                $("<div/>", {
+                    class: "boldText bg-white",
+                    html: "Blacklists:",
+                }).appendTo($policyRow);
 
+                // Add a table where each row has a list for this module
+                $tableBody = $("<tbody/>").appendTo(
+                    $("<table/>", {
+                        class: "table table-borderless",
+                    }).appendTo($policyRow)
+                );
+
+                // Add the lists to the table
+                Object.keys(blacklistFields).forEach((fieldId) => {
+                    $row = $("<tr>")
+                        .append($("<td/>").html(blacklistFields[fieldId]))
+                        .appendTo($tableBody);
+
+                    $("<td/>")
+                        .append(
+                            $("<button/>", {
+                                class: "btn btn-primary open-popup-btn",
+                                text: "Modify List",
+                                "data-modal-id": `list-popup-${fieldId}`,
+                            })
+                        )
+                        .appendTo($row);
+                    $("body").append(
+                        $("<div/>", {
+                            class: "modal fade",
+                            id: `list-popup-${fieldId}`,
+                            tabindex: "-1",
+                            "aria-labelledby": "listPopupLabel",
+                            "aria-hidden": "true",
+                            role: "dialog",
+                        }).append(
+                            $("<div/>", {
+                                class: "modal-dialog modal-dialog-centered modal-dialog-scrollable",
+                                role: "document",
+                            }).append(
+                                $("<div/>", {
+                                    class: "modal-content",
+                                })
+                                    .append(
+                                        $("<div/>", {
+                                            class: "modal-header",
+                                        })
+                                            .append(
+                                                $("<h5/>", {
+                                                    class: "modal-title",
+                                                    text: "List Editor",
+                                                })
+                                            )
+                                            .append(
+                                                $("<button/>", {
+                                                    type: "button",
+                                                    class: "btn-close",
+                                                    "data-bs-dismiss": "modal",
+                                                    "aria-label": "Close",
+                                                })
+                                            )
+                                    )
+                                    .append(
+                                        $("<div/>", {
+                                            class: "modal-body",
+                                        })
+                                            .append(
+                                                $("<div/>", {
+                                                    class: "mb-3",
+                                                })
+                                                    .append(
+                                                        $("<input/>", {
+                                                            type: "text",
+                                                            id: `newListValueInput-${fieldId}`,
+                                                            class: "form-control",
+                                                            placeholder:
+                                                                "Enter a new value",
+                                                        })
+                                                    )
+                                                    .append(
+                                                        $("<button/>", {
+                                                            class: "btn btn-primary mt-2 add-value-btn",
+                                                            text: "Add Value",
+                                                            "data-field-id":
+                                                                fieldId,
+                                                        })
+                                                    )
+                                            )
+                                            .append(
+                                                $("<ul/>", {
+                                                    id: `list-${fieldId}`,
+                                                    class: "list-group",
+                                                })
+                                            )
+                                    )
+                            )
+                        )
+                    );
+                    // Initial rendering of the list
+                    renderBlacklist(fieldId);
+                });
+            }
             blacklistExt();
         }
 
@@ -448,11 +640,7 @@ $(document).ready(function () {
             loadActions(),
             loadBlacklistFields(),
             loadBlacklistValues(),
-        ])
-            .then(loadPage)
-            .catch((error) => {
-                $("#error_message").text(`Failed to load page: ${error}`);
-            });
+        ]).then(loadPage);
     }
 
     loadingAnimation();
