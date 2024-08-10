@@ -70,3 +70,8 @@ input:checked + .slider:before {
 .modal-content {
     z-index: 1060;
 }
+
+.modal-subtitle {
+    font-family: "klavika";
+    font-weight: 300;
+}

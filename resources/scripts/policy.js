@@ -155,6 +155,9 @@ $(document).ready(function () {
         list.empty();
         var valuesInList = blacklistsValues[fieldId];
         if (valuesInList) {
+            // Add counter
+            $(`#list-counter-${fieldId}`).text(`${valuesInList.length} items`);
+
             valuesInList.forEach((entry) => {
                 list.append(
                     $("<li/>", {
@@ -169,6 +172,9 @@ $(document).ready(function () {
                     )
                 );
             });
+        }
+        else {
+            $(`#list-counter-${fieldId}`).text("0 items");
         }
     }
 
@@ -469,14 +475,22 @@ $(document).ready(function () {
                                 })
                                     .append(
                                         $("<div/>", {
-                                            class: "modal-header",
-                                        })
-                                            .append(
-                                                $("<h5/>", {
-                                                    class: "modal-title",
-                                                    text: "List Editor",
-                                                })
-                                            )
+                                            class: "modal-header d-flex align-items-center justify-content-between",
+                                        }).append($("<div/>", {
+                                            class: "modal-title-container d-flex flex-column me-auto"
+                                        }).append(
+                                            $("<h5/>", {
+                                                class: "modal-title",
+                                                text: "List Editor",
+                                            })
+                                        ).append(
+                                            $("<small/>", {
+                                                id: `list-counter-${fieldId}`,
+                                                class: "modal-subtitle text-muted"
+                                            })
+                                        ))
+                                            
+                                            
                                             .append(
                                                 $("<button/>", {
                                                     type: "button",
