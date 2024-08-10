@@ -122,40 +122,64 @@ $(document).ready(function () {
 
     // Load the field list for the blacklist module
     function loadBlacklistFields() {
-        let fields = [
-            { name: "domain", id: 1 },
-            { name: "subject", id: 2 },
-            { name: "SPF_IP", id: 3 },
-            { name: "country", id: 4 },
-        ];
-
-        fields.forEach((field) => {
-            blacklistFields[field.id] = field.name;
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/blacklist/fields",
+                type: "GET",
+                success: function (res) {
+                    res.forEach((field) => {
+                        blacklistFields[field.id] = field.name;
+                    });
+                    resolve();
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                    reject(res);
+                },
+            });
         });
     }
 
     // Load the values to input the blacklist module
     function loadBlacklistValues() {
-        let fullList = [
-            { id: 0, field_id: 1, value: "test value" },
-            { id: 1, field_id: 2, value: "test value1" },
-            { id: 2, field_id: 2, value: "test value2" },
-        ];
-
-        fullList.forEach((value) => {
-            const { field_id, ...rest } = value;
-            if (!(field_id in blacklistsValues))
-                blacklistsValues[field_id] = [];
-            blacklistsValues[field_id].push(rest);
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/blacklist",
+                type: "GET",
+                success: function (res) {
+                    res.forEach((value) => {
+                        const { field_id, ...rest } = value;
+                        if (!(field_id in blacklistsValues))
+                            blacklistsValues[field_id] = [];
+                        blacklistsValues[field_id].push(rest);
+                    });
+                    resolve();
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                    reject(res);
+                },
+            });
         });
     }
 
+    // Clear the current state of the list and update the look of the list with the current state
     function renderBlacklist(fieldId) {
         var list = $(`#list-${fieldId}`);
         list.empty();
         var valuesInList = blacklistsValues[fieldId];
         if (valuesInList) {
-            // Add counter
+            // Add counter of items
             $(`#list-counter-${fieldId}`).text(`${valuesInList.length} items`);
 
             valuesInList.forEach((entry) => {
@@ -172,10 +196,14 @@ $(document).ready(function () {
                     )
                 );
             });
-        }
-        else {
+        } else {
             $(`#list-counter-${fieldId}`).text("0 items");
         }
+
+        // Adapt the state of the apply changes button if there's a need to
+        if (addToBlacklist.length + removeFromBlacklist.length > 0)
+            enableApplyChangesButton();
+        else disableApplyChangesButton();
     }
 
     // Add new value to the list
@@ -238,7 +266,7 @@ $(document).ready(function () {
         // Remove the entry from added values if its a new value
         index = addToBlacklist.findIndex((obj) => obj.value === removedValue);
 
-        if (index === -1) addToBlacklist.splice(index, 1);
+        if (index !== -1) addToBlacklist.splice(index, 1);
 
         renderBlacklist(fieldId);
     });
@@ -476,21 +504,25 @@ $(document).ready(function () {
                                     .append(
                                         $("<div/>", {
                                             class: "modal-header d-flex align-items-center justify-content-between",
-                                        }).append($("<div/>", {
-                                            class: "modal-title-container d-flex flex-column me-auto"
-                                        }).append(
-                                            $("<h5/>", {
-                                                class: "modal-title",
-                                                text: "List Editor",
-                                            })
-                                        ).append(
-                                            $("<small/>", {
-                                                id: `list-counter-${fieldId}`,
-                                                class: "modal-subtitle text-muted"
-                                            })
-                                        ))
-                                            
-                                            
+                                        })
+                                            .append(
+                                                $("<div/>", {
+                                                    class: "modal-title-container d-flex flex-column me-auto",
+                                                })
+                                                    .append(
+                                                        $("<h5/>", {
+                                                            class: "modal-title",
+                                                            text: "List Editor",
+                                                        })
+                                                    )
+                                                    .append(
+                                                        $("<small/>", {
+                                                            id: `list-counter-${fieldId}`,
+                                                            class: "modal-subtitle text-muted",
+                                                        })
+                                                    )
+                                            )
+
                                             .append(
                                                 $("<button/>", {
                                                     type: "button",
@@ -610,6 +642,69 @@ $(document).ready(function () {
                 });
 
             // Handle changes in blacklist module
+            let changed = false;
+            if (addToBlacklist.length > 0)
+                $.ajax({
+                    url: "/blacklist/add",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(addToBlacklist),
+                    success: function (res) {
+                        // Load the changes locally to enable a continuation
+                        changed = true;
+
+                        // Add a success message
+                        $("#success-message").text(
+                            "Policy updated successfully"
+                        );
+
+                        // Reset the list of changes made and the button
+                        addToBlacklist = [];
+                        disableApplyChangesButton();
+                    },
+                    error: function (res) {
+                        if (res.status == 401) {
+                            window.location.href = "/login";
+                        }
+                        if (res.responseJSON && res.responseJSON.error) {
+                            $("#error_message").text(res.responseJSON.error);
+                        }
+                    },
+                });
+
+            if (removeFromBlacklist.length > 0)
+                $.ajax({
+                    url: "/blacklist/remove",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(removeFromBlacklist),
+                    success: function (res) {
+                        // Load the changes locally to enable a continuation
+                        changed = true;
+
+                        // Add a success message
+                        $("#success-message").text(
+                            "Policy updated successfully"
+                        );
+
+                        // Reset the list of changes made and the button
+                        removeFromBlacklist = true;
+                        disableApplyChangesButton();
+                    },
+                    error: function (res) {
+                        if (res.status == 401) {
+                            window.location.href = "/login";
+                        }
+                        if (res.responseJSON && res.responseJSON.error) {
+                            $("#error_message").text(res.responseJSON.error);
+                        }
+                    },
+                });
+
+            if (changed){
+                getBlacklists();
+                renderBlacklist();
+            }
         });
 
         // Load every module with an extension

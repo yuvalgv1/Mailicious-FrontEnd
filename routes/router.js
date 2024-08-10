@@ -26,5 +26,10 @@ router.get("/enum_verdicts", actionsontroller.verdicts);
 router.get("/actions", actionsontroller.getActions);
 router.post("/actions", actionsontroller.updateActions);
 router.post("/modules/toggle", actionsontroller.toggleModule);
+router.get("/blacklist/fields", actionsontroller.getBlacklistFields);
+router.get("/blacklist", actionsontroller.getBlacklists);
+router.post("/blacklist/add", actionsontroller.addToBlacklist);
+router.post("/blacklist/remove", actionsontroller.removeFromBlacklist);
+
 
 module.exports = router;
