@@ -238,10 +238,7 @@ $(document).ready(function () {
                 )
                 .appendTo($headerButtons)
                 .click(function () {
-                    togglePopup(
-                        $(this),
-                        $(`#${$(this).data("popup-id")}`)
-                    );
+                    togglePopup($(this), $(`#${$(this).data("popup-id")}`));
                 });
             if (filteredFields.has(field))
                 $(`#${field}-filter-button`).addClass("text-primary");
@@ -380,8 +377,9 @@ $(document).ready(function () {
                     cellText = `${email[field][0]} and ${
                         email[field].length - 1
                     } more`;
-                else if (isDate(cellText))
+                else if (isDate(cellText)) {
                     cellText = formatDateTime(new Date(cellText));
+                }
                 $row.append($("<td>").text(cellText));
 
                 // Temporarly create a set for every value in a field
@@ -656,15 +654,15 @@ $(document).ready(function () {
     function isDate(value) {
         // Regular expression for the ISO 8601 format (YYYY-MM-DDTHH:mm:ss.ssssss)
         const iso8601Format = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+$/;
+        const anotherFormat = /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+$/;
 
         // Check if the value matches the ISO 8601 format regex
-        if (!iso8601Format.test(value)) {
-            return false;
+        if (iso8601Format.test(value) || anotherFormat.test(value)) {
+            // Check if the value is a valid date
+            const date = new Date(value);
+            return !isNaN(date.getTime());
         }
-
-        // Check if the value is a valid date
-        const date = new Date(value);
-        return !isNaN(date.getTime());
+        return false;
     }
 
     // Function to sort the table
