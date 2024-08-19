@@ -8,6 +8,7 @@ $(document).ready(function () {
     const benignID = 1;
     let changesMade = {};
     let changedModules = [];
+    let totalChanges = new Set();
 
     // Blacklist module variables
     const blacklistID = 3;
@@ -202,7 +203,10 @@ $(document).ready(function () {
 
         // Adapt the state of the apply changes button if there's a need to
         if (addToBlacklist.length + removeFromBlacklist.length > 0)
-            enableApplyChangesButton();
+            totalChanges.add("Blacklist");
+        else totalChanges.delete("Blacklist");
+
+        if (totalChanges.size > 0) enableApplyChangesButton();
         else disableApplyChangesButton();
     }
 
@@ -379,8 +383,8 @@ $(document).ready(function () {
                                     $("<input/>", {
                                         type: "checkbox",
                                         class: "action-checkbox",
-                                        "data-actionID": act.id,
-                                        "data-actionType": "block",
+                                        "data-action-id": act.id,
+                                        "data-action-type": "block",
                                     }).prop("checked", act.block)
                                 )
                             );
@@ -392,8 +396,8 @@ $(document).ready(function () {
                                     $("<input/>", {
                                         type: "checkbox",
                                         class: "action-checkbox",
-                                        "data-actionID": act.id,
-                                        "data-actionType": "alert",
+                                        "data-action-id": act.id,
+                                        "data-action-type": "alert",
                                     }).prop("checked", act.alert)
                                 )
                             )
@@ -418,8 +422,8 @@ $(document).ready(function () {
             // Remove the success message
             $("#success-message").text("");
 
-            currentActionID = parseInt($(this).data("actionID"));
-            currentActionType = $(this).data("actionType");
+            currentActionID = parseInt($(this).data("action-id"));
+            currentActionType = $(this).data("action-type");
 
             currentAction = changesMade[currentActionID];
             originalAction = {
@@ -429,6 +433,7 @@ $(document).ready(function () {
             // If there are no changes made to this button yet add it to the changed buttons
             if (!currentAction) {
                 changesMade[currentActionID] = { ...originalAction };
+                totalChanges.add("Actions");
                 enableApplyChangesButton();
             }
             // Change the state of the action that we are on
@@ -446,7 +451,8 @@ $(document).ready(function () {
             ) {
                 delete changesMade[currentActionID];
                 if (Object.keys(changesMade).length === 0)
-                    disableApplyChangesButton();
+                    totalChanges.delete("Actions");
+                if (totalChanges.size === 0) disableApplyChangesButton();
             }
         });
 
@@ -580,7 +586,7 @@ $(document).ready(function () {
             // Handle the toggle action (on/off) for the module by sending the server the update
             if (changedModules.length > 0)
                 $.ajax({
-                    url: "/modules/toggle",
+                    url: "/enum_modules/update",
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify(changedModules),
@@ -592,7 +598,7 @@ $(document).ready(function () {
 
                         // Reset the list of modules and the apply button
                         changedModules = [];
-                        disableApplyChangesButton();
+                        totalChanges.delete("Modules");
                     },
                     error: function (res) {
                         if (res.status == 401) {
@@ -629,7 +635,7 @@ $(document).ready(function () {
 
                         // Reset the list of changes made and the button
                         changesMade = {};
-                        disableApplyChangesButton();
+                        totalChanges.delete("Actions");
                     },
                     error: function (res) {
                         if (res.status == 401) {
@@ -660,7 +666,7 @@ $(document).ready(function () {
 
                         // Reset the list of changes made and the button
                         addToBlacklist = [];
-                        disableApplyChangesButton();
+                        totalChanges.delete("Blacklist");
                     },
                     error: function (res) {
                         if (res.status == 401) {
@@ -689,7 +695,7 @@ $(document).ready(function () {
 
                         // Reset the list of changes made and the button
                         removeFromBlacklist = true;
-                        disableApplyChangesButton();
+                        totalChanges.delete("Blacklist");
                     },
                     error: function (res) {
                         if (res.status == 401) {
@@ -701,10 +707,12 @@ $(document).ready(function () {
                     },
                 });
 
-            if (changed){
+            if (changed) {
                 getBlacklists();
                 renderBlacklist();
             }
+
+            if (totalChanges.size === 0) disableApplyChangesButton();
         });
 
         // Load every module with an extension
@@ -721,19 +729,24 @@ $(document).ready(function () {
                 .substr(togglePrefix.length + 1)
         );
 
-        if (changedModules.includes(moduleID))
-            changedModules = changedModules.filter((e) => e !== moduleID);
-        else changedModules.push(moduleID);
-
         // Update the local state
         currentModule = modules.find((mod) => mod.id === moduleID);
         currentModule.enabled = !currentModule.enabled;
 
+        // Update the list that will be sent to the server
+        const index = changedModules.findIndex((mod) => mod.id === moduleID);
+        if (index !== -1) changedModules.splice(index, 1);
+        else changedModules.push({ id: moduleID, enabled: currentModule.enabled });
+
         // Remove the success message
         $("#success-message").text("");
 
-        if (changedModules.length === 0) disableApplyChangesButton();
-        else enableApplyChangesButton();
+        if (changedModules.length > 0) totalChanges.add("Modules");
+        else totalChanges.delete("Modules");
+
+        if (totalChanges.size > 0) enableApplyChangesButton();
+        else disableApplyChangesButton();
+
     });
 
     $modulesTable.on("click", ".module-row", function (e) {

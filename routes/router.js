@@ -22,10 +22,10 @@ router.get("/settings", usersController.isLoggedIn, pagesController.settings);
 // Actions Controller
 router.post("/search", actionsontroller.search);
 router.get("/enum_modules", actionsontroller.modules);
+router.post("/enum_modules/update", actionsontroller.toggleModule);
 router.get("/enum_verdicts", actionsontroller.verdicts);
 router.get("/actions", actionsontroller.getActions);
 router.post("/actions", actionsontroller.updateActions);
-router.post("/modules/toggle", actionsontroller.toggleModule);
 router.get("/blacklist/fields", actionsontroller.getBlacklistFields);
 router.get("/blacklist", actionsontroller.getBlacklists);
 router.post("/blacklist/add", actionsontroller.addToBlacklist);

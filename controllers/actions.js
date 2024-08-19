@@ -109,7 +109,7 @@ async function toggleModule(req, res) {
     const token = req.cookies.access_token;
     try {
         const response = await fetch(
-            `${process.env.BACKEND_URL}/modules/toggle`,
+            `${process.env.BACKEND_URL}/enum_modules/update`,
             {
                 method: "POST",
                 headers: {
