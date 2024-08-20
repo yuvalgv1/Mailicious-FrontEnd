@@ -441,12 +441,14 @@ $(document).ready(function () {
                 }
             });
             if (newVisibleValues.length > 0) {
+                console.log(newVisibleValues[0], newVisibleValues.length)
                 if (typeof (newVisibleValues[0] === "boolean"))
                     if (newVisibleValues.length === 1)
                         valuesToFilter[checklistID] = newVisibleValues[0];
                     else delete valuesToFilter[checklistID];
                 else valuesToFilter[checklistID] = newVisibleValues;
             } else delete valuesToFilter[checklistID];
+            console.log(valuesToFilter);
         }
 
         updateSelectAllCheckbox(checklistID);
