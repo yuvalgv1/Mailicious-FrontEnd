@@ -10,14 +10,6 @@ body {
 }
 
 #sidebar-navbar {
-    background-color: #003366;
-}
-
-.navbar {
-    background-color: #4682b4;
-}
-
-#sidebar-navbar {
     width: var(--navbar_width);
     transition: margin-left 0.3s, width 0.3s;
     z-index: 10;
@@ -61,18 +53,15 @@ header {
 
 .nav-btn {
     font-size: 24px;
-    color: #ffffff;
 }
 
 .profile-name {
     font-weight: bold;
     font-size: 18px;
-    color: black;
 }
 
 #logout {
     font-size: 24px;
-    color: black;
 }
 
 .page-name {

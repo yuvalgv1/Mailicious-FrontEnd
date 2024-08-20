@@ -1,7 +1,6 @@
 function removeLoading(button, button_text) {
     // This function reset the button from the loading mode.
     if (button.prop("disabled")) {
-        button.removeClass("bg-warning");
         button.prop("disabled", false);
         button.html(button_text);
     }
@@ -12,7 +11,6 @@ $("form").on("submit", function (event) {
     submit_button = $(this).find("button");
     button_text = submit_button.text();
     submit_button.prop("disabled", true);
-    submit_button.addClass("bg-warning");
     submit_button.text("");
     submit_button.append(
         $("<span/>", {

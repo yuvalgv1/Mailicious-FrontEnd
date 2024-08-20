@@ -17,7 +17,7 @@
     </div>
     <button
         id="customize-table"
-        class="help-button has-popup"
+        class="btn help-button has-popup btn-main"
         title="Customize Table"
         data-popup-id="columns-popup"
     >
@@ -25,7 +25,7 @@
     </button>
     <button
         id="date-filter"
-        class="help-button has-popup"
+        class="btn help-button has-popup btn-main"
         title="Select Range"
         data-popup-id="date-popup"
     >
@@ -56,7 +56,7 @@
             <ul id="columns-list" class="list-group">
                 <!-- Columns will be dynamically added here -->
             </ul>
-            <button id="apply-column-changes" class="btn btn-primary mt-3">
+            <button id="apply-column-changes" class="btn btn-main mt-3">
                 Apply Changes
             </button>
         </div>
@@ -75,10 +75,10 @@
                 id="date-buttons-container"
                 class="d-flex justify-content-between"
             >
-                <button id="apply-date-filter" class="btn btn-primary mt-2">
+                <button id="apply-date-filter" class="btn btn-main mt-2">
                     Apply
                 </button>
-                <button id="clear-date-filter" class="btn border mt-2">
+                <button id="clear-date-filter" class="btn btn-empty border mt-2">
                     Clear
                 </button>
             </div>
@@ -86,12 +86,12 @@
     </div>
 </div>
 <div id="table-area" class="container">
-    <div id="error_message" class="text-danger"></div>
+    <div id="error_message" class="text-danger-color"></div>
     <div id="loading-message"></div>
     <div class="table-responsive">
         <table
             id="emails_table"
-            class="table table-hover table-striped"
+            class="table table-hover table-striped table-dynamic-color"
         ></table>
     </div>
     <script src="/scripts/search.js"></script>

@@ -38,18 +38,12 @@ $(document).ready(function () {
 
     // Change state of the apply changes button.
     function enableApplyChangesButton() {
-        $("#apply-changes")
-            .removeClass("btn-secondary")
-            .addClass("btn-primary")
-            .prop("disabled", false);
+        $("#apply-changes").prop("disabled", false);
     }
 
     // Change state of the apply changes button.
     function disableApplyChangesButton() {
-        $("#apply-changes")
-            .addClass("btn-secondary")
-            .removeClass("btn-primary")
-            .prop("disabled", true);
+        $("#apply-changes").prop("disabled", true);
     }
 
     // Load the modules list from the server
@@ -411,7 +405,7 @@ $(document).ready(function () {
         $("#apply-changes-area").append(
             $("<button/>", {
                 id: "apply-changes",
-                class: "btn btn-secondary position-absolute end-0",
+                class: "btn btn-main position-absolute end-0",
                 text: "Apply Changes",
                 disabled: true,
             })
@@ -485,7 +479,7 @@ $(document).ready(function () {
                     $("<td/>")
                         .append(
                             $("<button/>", {
-                                class: "btn btn-primary open-popup-btn",
+                                class: "btn btn-main open-popup-btn",
                                 text: "Modify List",
                                 "data-modal-id": `list-popup-${fieldId}`,
                             })
@@ -557,7 +551,7 @@ $(document).ready(function () {
                                                     )
                                                     .append(
                                                         $("<button/>", {
-                                                            class: "btn btn-primary mt-2 add-value-btn",
+                                                            class: "btn btn-main mt-2 add-value-btn",
                                                             text: "Add Value",
                                                             "data-field-id":
                                                                 fieldId,
@@ -736,7 +730,11 @@ $(document).ready(function () {
         // Update the list that will be sent to the server
         const index = changedModules.findIndex((mod) => mod.id === moduleID);
         if (index !== -1) changedModules.splice(index, 1);
-        else changedModules.push({ id: moduleID, enabled: currentModule.enabled });
+        else
+            changedModules.push({
+                id: moduleID,
+                enabled: currentModule.enabled,
+            });
 
         // Remove the success message
         $("#success-message").text("");
@@ -746,7 +744,6 @@ $(document).ready(function () {
 
         if (totalChanges.size > 0) enableApplyChangesButton();
         else disableApplyChangesButton();
-
     });
 
     $modulesTable.on("click", ".module-row", function (e) {

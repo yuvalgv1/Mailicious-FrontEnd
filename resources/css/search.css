@@ -11,7 +11,6 @@
 }
 
 .help-button {
-    background-color: #008080;
     border-radius: 50%; /* rounded-circle */
     border: none; /* border-0 */
     position: absolute; /* position-absolute */
@@ -23,38 +22,12 @@
     transition: background-color 0.2s ease;
 }
 
-.help-button:active {
-    background-color: #36648b; /* Darker shade of bg-info */
-}
-
-.table {
-    --bs-table-color: #000;
-    --bs-table-bg: #ffffff;
-    --bs-table-border-color: #a6c3ca;
-    --bs-table-striped-bg: #ffffff;
-    --bs-table-striped-color: #000;
-    --bs-table-active-bg: #4682b4;
-    --bs-table-active-color: #000;
-    --bs-table-hover-bg: #4682b4;
-    --bs-table-hover-color: #000;
-    color: var(--bs-table-color);
-    border-color: var(--bs-table-border-color);
-}
-
 #customize-table {
     right: 10px;
 }
 
 #date-filter {
     right: 70px;
-}
-
-#clear-date-filter:hover {
-    background: #e2e1e1;
-}
-
-#clear-date-filter:active {
-    background: #b5b5b5;
 }
 
 .popup {

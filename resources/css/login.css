@@ -22,22 +22,6 @@ body {
     box-shadow: 5px 5px 15px grey;
 }
 
-.btn-light {
-    background-color: #ffffff;
-    color: #000000;
-}
-
-.btn-light:focus,
-.btn-light:active:focus {
-    background-color: #f1a63c;
-    color: #000000;
-}
-
-.btn-light:hover {
-    color: black;
-    background-color: #eecb9a;
-}
-
 .headtitle {
     font-weight: bold;
 }

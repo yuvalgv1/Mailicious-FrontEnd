@@ -14,8 +14,9 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         />
-        <link rel="stylesheet" href="/css/main.css" />
-        <link rel="stylesheet" href="/css/fonts.css" />
+        <link rel="stylesheet" href="css/colors.css"/>
+        <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/fonts.css" />
     </head>
     <body>
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -38,10 +39,10 @@
         <div class="d-flex">
             <nav
                 id="sidebar-navbar"
-                class="d-flex navbar navbar-expand-lg flex-column vh-100 position-fixed"
+                class="d-flex navbar navbar-expand-lg flex-column vh-100 position-fixed bg-second-color"
             >
-                <button title="Menu" class="btn menu-btn">
-                    <i class="fas fa-bars text-white"></i>
+                <button title="Menu" class="btn menu-btn text-light-color">
+                    <i class="fas fa-bars"></i>
                 </button>
                 <div class="nav-buttons flex-column mt-3">
                     <button
@@ -49,7 +50,7 @@
                         title="Home"
                         data-title="Home"
                         data-path="/home"
-                        class="btn nav-btn d-flex align-items-center mb-2"
+                        class="btn nav-btn d-flex align-items-center mb-2 text-light-color"
                     >
                         <i class="fas fa-home"></i>
                         <span class="nav-text ml-2 d-none mx-2">Home</span>
@@ -59,7 +60,7 @@
                         title="Data Search"
                         data-title="Data Search"
                         data-path="/search"
-                        class="btn nav-btn d-flex align-items-center mb-2"
+                        class="btn nav-btn d-flex align-items-center mb-2 text-light-color"
                     >
                         <i class="fas fa-search"></i>
                         <span class="nav-text ml-2 d-none mx-2"
@@ -71,7 +72,7 @@
                         title="Policy"
                         data-title="Policy"
                         data-path="/policy"
-                        class="btn nav-btn d-flex align-items-center mb-2"
+                        class="btn nav-btn d-flex align-items-center mb-2 text-light-color"
                     >
                         <i class="fas fa-wrench"></i>
                         <span class="nav-text ml-2 d-none mx-2">Policy</span>
@@ -83,7 +84,7 @@
                         title="Settings"
                         data-title="Settings"
                         data-path="/settings"
-                        class="btn nav-btn d-flex align-items-center"
+                        class="btn nav-btn d-flex align-items-center text-light-color"
                     >
                         <i class="fas fa-cog"></i>
                         <span class="nav-text ml-2 d-none mx-2">Settings</span>
@@ -91,7 +92,7 @@
                 </div>
             </nav>
             <div class="main-content">
-                <header class="navbar navbar-expand sticky-top">
+                <header class="navbar navbar-expand sticky-top bg-main-color text-dark-color">
                     <a class="mx-2" href="/" title="Mailicious">
                         <img src="images\logo.png" class="header-logo" />
                     </a>
@@ -105,7 +106,7 @@
                         id="logout"
                         title="logout"
                         data-title="Logout"
-                        class="btn d-flex align-items-center"
+                        class="btn d-flex align-items-center text-dark-color"
                     >
                         <i class="fas fa-arrow-right-from-bracket"></i>
                     </button>
