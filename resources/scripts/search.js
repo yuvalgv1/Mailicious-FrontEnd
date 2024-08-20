@@ -436,6 +436,7 @@ $(document).ready(function () {
             let newVisibleValues = [];
             $(`#${checklistID}-list .checkbox-column`).each(function () {
                 let value = $(this).closest("li").data("value");
+                console.log(typeof(value));
                 if ($(this).is(":checked")) {
                     newVisibleValues.push(value);
                 }
