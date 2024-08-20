@@ -31,6 +31,8 @@ $("form").on("submit", function (event) {
         success: function (res) {
             path = sessionStorage.getItem("redirect_path");
             sessionStorage.removeItem("redirect_path");
+
+            removeLoading(submit_button, button_text);
             if (path) {
                 window.location.href = path;
             } else {
