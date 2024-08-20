@@ -597,10 +597,8 @@ $(document).ready(function () {
                         );
 
                         // Reset the list of modules and the apply button
-                        console.log(totalChanges);
                         changedModules = [];
                         totalChanges.delete("Modules");
-                        console.log(totalChanges);
                     },
                     error: function (res) {
                         if (res.status == 401) {
@@ -714,7 +712,7 @@ $(document).ready(function () {
                 renderBlacklist();
             }
 
-            if (totalChanges.size === 0) disableApplyChangesButton();
+            disableApplyChangesButton();
         });
 
         // Load every module with an extension
