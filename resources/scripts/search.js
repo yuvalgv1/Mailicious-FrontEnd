@@ -436,14 +436,17 @@ $(document).ready(function () {
             let newVisibleValues = [];
             $(`#${checklistID}-list .checkbox-column`).each(function () {
                 let value = $(this).closest("li").data("value");
-                console.log(typeof(value));
                 if ($(this).is(":checked")) {
                     newVisibleValues.push(value);
                 }
             });
-            if (newVisibleValues.length > 0)
-                valuesToFilter[checklistID] = newVisibleValues;
-            else delete valuesToFilter[checklistID];
+            if (newVisibleValues.length > 0) {
+                if (typeof (newVisibleValues[0] === "boolean"))
+                    if (newVisibleValues.length === 1)
+                        valuesToFilter[checklistID] = newVisibleValues[0];
+                    else delete valuesToFilter[checklistID];
+                else valuesToFilter[checklistID] = newVisibleValues;
+            } else delete valuesToFilter[checklistID];
         }
 
         updateSelectAllCheckbox(checklistID);
