@@ -712,6 +712,7 @@ $(document).ready(function () {
                 renderBlacklist();
             }
 
+            console.log(totalChanges);
             if (totalChanges.size === 0) disableApplyChangesButton();
         });
 
