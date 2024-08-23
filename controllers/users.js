@@ -115,9 +115,87 @@ async function user(req, res) {
     }
 }
 
+async function getUsers(req, res) {
+    try {
+        const token = req.cookies.access_token;
+        const response = await fetch(`${process.env.BACKEND_URL}/users`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+async function addUser(req, res) {
+    try {
+        const token = req.cookies.access_token;
+        const response = await fetch(`${process.env.BACKEND_URL}/users/add`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(req.body)
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+async function deleteUser(req, res) {
+    try {
+        const token = req.cookies.access_token;
+        const response = await fetch(`${process.env.BACKEND_URL}/users/delete`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(req.body)
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+async function resetPassword(req, res) {
+    try {
+        const token = req.cookies.access_token;
+        const response = await fetch(`${process.env.BACKEND_URL}/users/reset`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(req.body)
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
 module.exports = {
     login,
     isLoggedIn,
     logout,
     user,
+    getUsers,
+    addUser,
+    deleteUser,
+    resetPassword
 };

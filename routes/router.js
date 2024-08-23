@@ -10,6 +10,10 @@ const actionsontroller = require("../controllers/actions");
 router.post("/login", usersController.login);
 router.get("/logout", usersController.logout);
 router.get("/user", usersController.user);
+router.get("/users", usersController.getUsers);
+router.post("/users/add", usersController.addUser);
+router.post("/users/delete", usersController.deleteUser);
+router.post("/users/reset", usersController.resetPassword);
 
 // Navigation Controller
 router.get("/", usersController.isLoggedIn, pagesController.home);
