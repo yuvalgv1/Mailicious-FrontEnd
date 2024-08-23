@@ -21,17 +21,24 @@ $(document).ready(function () {
     });
 
     $("#logout").click(function () {
+        let match = document.cookie.match(new RegExp('(^| )access_token=([^;]+)'));
+        let token = match ? match[2] : "";
         const cookies = document.cookie.split(";");
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i];
             const eqPos = cookie.indexOf("=");
-            const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+            const name = eqPos > -1 ? cookie.slice(0, eqPos) : cookie;
             document.cookie =
                 name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
         }
         localStorage.clear();
         sessionStorage.clear();
-        window.location.href = "/logout";
+
+        $.get('/logout', { token: token }, function(data) {
+            window.location.href = '/login'
+        }).fail(function(error) {
+            console.log('Error:', error);
+        });
     });
 
     // Route through the website
