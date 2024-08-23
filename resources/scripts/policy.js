@@ -213,8 +213,12 @@ $(document).ready(function () {
         $(`#newListValueInput-${fieldId}`).val("");
 
         if (newValue) {
-            var currentList = blacklistsValues[fieldId];
+            // If this is the first time a value is added to that list
+            if (!blacklistsValues[fieldId])
+                blacklistsValues[fieldId] = [];
 
+            var currentList = blacklistsValues[fieldId];
+        
             // If the value already exists, don't change anything
             if (!currentList.some((entry) => entry.value === newValue)) {
                 // If the value was removed before changes applied it will bring it back
