@@ -304,6 +304,8 @@ $(document).ready(function () {
 
     // Render the list inside the countries modal
     function renderCountries(searchTerm = "") {
+        console.log(searchTerm);
+        console.log(currentModalFieldId);
         const countryList = $("#countryList");
         countryList.empty();
         searchedCountries = [];
@@ -482,7 +484,6 @@ $(document).ready(function () {
         if (currentModalFieldId === countriesFieldId) {
             $("#blacklistCountriesModal").modal("show");
             await getCountries();
-            console.log(listOfCountries);
             renderCountries();
             renderSelectedCountries();
         } else {
