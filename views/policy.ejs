@@ -13,4 +13,33 @@
     </table>
 </div>
 <div id="apply-changes-area" class="container position-relative"></div>
+
+<!-- Generic modal for blacklist -->
+<div id="blacklistFieldModal" class="modal fade" tabindex="-1" aria-labelledby="listPopupLabel" aria-hidden="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center justify-content-between">
+                <div class="modal-title-container d-flex flex-column me-auto">
+                    <h5 class="modal-title">
+                        List Editor
+                    </h5>
+                    <small id="list-counter" class="modal-subtitle text-muted">
+                    </small>
+                </div>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" id="newListValueInput" class="form-control" placeholder="Enter a new value">
+                    <button class="btn btn-main mt-2 add-value-btn">Add Value</button>
+                </div>
+                <ul id="blacklistValues" class="list-group">
+                    <!-- Entries will be populated here by jQuery -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
 <script src="/scripts/policy.js"></script>
