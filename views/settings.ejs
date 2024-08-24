@@ -1,1 +1,219 @@
-<p>Set the settings here.</p>
+<link rel="stylesheet" href="/css/settings.css" />
+<div id="top" class="container">
+    <div class="page-name h4">Settings</div>
+    <div id="success_message" class="text-success-color"></div>
+</div>
+<div class="container">
+    <div class="settings-section-title">User Management</div>
+    <hr />
+    <table id="users_table" class="table">
+        <tbody>
+            <!-- Rows will be populated here by jQuery -->
+        </tbody>
+    </table>
+    <button id="addUser" class="btn btn-main">
+        Create User
+    </button>
+</div>
+
+<!-- Add User Modal -->
+<div
+    class="modal fade"
+    id="addUserModal"
+    tabindex="-1"
+    aria-labelledby="addUserModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">
+                    Create User
+                </h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newUserEmail" class="form-label"
+                        >Email:</label
+                    >
+                    <input
+                        type="email"
+                        class="form-control"
+                        id="newUserEmail"
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="newUserName" class="form-label"
+                        >Full Name:</label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="newUserName"
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="newUserPassword" class="form-label"
+                        >Password:</label
+                    >
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="newUserPassword"
+                    />
+                </div>
+                <div
+                    class="alert alert-danger d-none"
+                    id="newUserError"
+                    role="alert"
+                ></div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-main"
+                    id="addUserSubmit"
+                >
+                    Create User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div
+    class="modal fade"
+    id="changePasswordModal"
+    tabindex="-1"
+    aria-labelledby="changePasswordModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">
+                    Change Password
+                </h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="oldPassword" class="form-label"
+                        >Please enter your old password</label
+                    >
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="oldPassword"
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label"
+                        >Please enter your new password</label
+                    >
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="newPassword"
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label"
+                        >Please confirm the new password</label
+                    >
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="confirmPassword"
+                    />
+                </div>
+                <div
+                    class="alert alert-danger d-none"
+                    id="passwordError"
+                    role="alert"
+                ></div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-main"
+                    id="submitPasswordChange"
+                >
+                    Change Password
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+    class="modal fade"
+    id="confirmationModal"
+    tabindex="-1"
+    aria-labelledby="confirmationModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">
+                    Confirm Deletion
+                </h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmationMessage"></p>
+                <div
+                    class="alert alert-danger d-none"
+                    id="passwordError"
+                    role="alert"
+                ></div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    No
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    Yes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/scripts/settings.js"></script>

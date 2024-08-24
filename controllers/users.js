@@ -23,7 +23,7 @@ async function login(req, res) {
 
         if (response.ok) {
             // Set the token as a secure cookie
-            const { access_token , id } = data;
+            const { access_token, id } = data;
             res.cookie("access_token", access_token, {
                 httpOnly: false, // Allow JavaScript access
                 sameSite: "Strict", // Mitigates CSRF attacks
@@ -83,7 +83,14 @@ async function isLoggedIn(req, res, next) {
 }
 
 // Handle user logout
-function logout(req, res) {
+async function logout(req, res) {
+    const token = req.query.token;
+    const response = await fetch(`${process.env.BACKEND_URL}/logout`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     req.session.destroy(() => {
         res.redirect("/login");
     });
@@ -94,15 +101,86 @@ async function user(req, res) {
     try {
         // Get user's details
         const token = req.cookies.access_token;
-        const response = await fetch(
-            `${process.env.BACKEND_URL}/users/me`,
-            {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        const response = await fetch(`${process.env.BACKEND_URL}/users/me`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+async function getUsers(req, res) {
+    try {
+        const token = req.cookies.access_token;
+        const response = await fetch(`${process.env.BACKEND_URL}/users`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+async function addUser(req, res) {
+    try {
+        const token = req.cookies.access_token;
+        const response = await fetch(`${process.env.BACKEND_URL}/users/add`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(req.body)
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+async function deleteUser(req, res) {
+    try {
+        const token = req.cookies.access_token;
+        const response = await fetch(`${process.env.BACKEND_URL}/users/delete`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(req.body)
+        });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+async function resetPassword(req, res) {
+    try {
+        const token = req.cookies.access_token;
+        const response = await fetch(`${process.env.BACKEND_URL}/users/reset`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(req.body)
+        });
 
         const data = await response.json();
         return res.status(response.status).json(data);
@@ -116,4 +194,8 @@ module.exports = {
     isLoggedIn,
     logout,
     user,
+    getUsers,
+    addUser,
+    deleteUser,
+    resetPassword
 };
