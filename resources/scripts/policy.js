@@ -12,14 +12,18 @@ $(document).ready(function () {
 
     // Blacklist module variables
     const blacklistID = 3;
+    const countriesFieldId = 4;
     let blacklistFields = {};
     let blacklistsValues = {};
     let addToBlacklist = [];
     let removeFromBlacklist = [];
     let currentModalFieldId = null;
+    let listOfCountries = [];
+    let searchedCountries = [];
 
     const $modulesTable = $("#modules_table tbody");
     $("#blacklistFieldModal").appendTo($("body"));
+    $("#blacklistCountriesModal").appendTo($("body"));
 
     // Add loading message when waiting for the server to send the data.
     function loadingAnimation() {
@@ -218,7 +222,7 @@ $(document).ready(function () {
                 blacklistsValues[currentModalFieldId] = [];
 
             var currentList = blacklistsValues[currentModalFieldId];
-        
+
             // If the value already exists, don't change anything
             if (!currentList.some((entry) => entry.value === newValue)) {
                 // If the value was removed before changes applied it will bring it back
@@ -272,11 +276,229 @@ $(document).ready(function () {
         renderBlacklist(currentModalFieldId);
     });
 
+    // Convert flag code to emoji
+    function countryCodeToFlagEmoji(countryCode) {
+        return countryCode;
+        // const codePoints = countryCode
+        //     .toUpperCase()
+        //     .split("")
+        //     .map((char) => 127397 + char.charCodeAt()); // 'A' is offset by 127397 to become a regional indicator symbol
+        // return String.fromCodePoint(...codePoints);
+    }
+
+    // Get the list of countries from an API
+    function getCountries() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "https://restcountries.com/v3.1/all",
+                type: "GET",
+                success: function (res) {
+                    listOfCountries = res.map((country) => ({
+                        name: country.name.common,
+                        flag: countryCodeToFlagEmoji(country.flag),
+                    }));
+                    resolve();
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                    reject("Error fetching countries.");
+                },
+            });
+        });
+    }
+
+    // Render the list inside the countries modal
+    function renderCountries(searchTerm = "") {
+        const countryList = $("#countryList");
+        countryList.empty();
+        searchedCountries = [];
+        if (searchTerm.length > 0) {
+            try {
+                var currentList = blacklistsValues[currentModalFieldId];
+
+                searchedCountries = listOfCountries
+                    .filter((country) => {
+                        const isInExclusionList = currentList.some(
+                            (excluded) =>
+                                excluded.value.toLowerCase() ===
+                                country.name.toLowerCase()
+                        );
+
+                        return (
+                            country.name
+                                .toLowerCase()
+                                .includes(searchTerm.toLowerCase()) &&
+                            !isInExclusionList
+                        );
+                    })
+                    .sort((a, b) => {
+                        const nameA = a.name.toLowerCase();
+                        const nameB = b.name.toLowerCase();
+                        const lowerSearchTerm = searchTerm.toLowerCase();
+
+                        // Prioritize countries whose names start with the search term
+                        const startsWithA = nameA.startsWith(lowerSearchTerm);
+                        const startsWithB = nameB.startsWith(lowerSearchTerm);
+
+                        if (startsWithA && !startsWithB) return -1;
+                        if (!startsWithA && startsWithB) return 1;
+
+                        return 0; // Keep order if both or neither start with the search term
+                    });
+
+                searchedCountries.forEach((country) => {
+                    $("<li/>", {
+                        class: "list-group-item d-flex justify-content-between align-items-center",
+                    })
+                        .append(
+                            $("<span/>").text(`${country.flag} ${country.name}`)
+                        )
+                        .append(
+                            $("<button/>", {
+                                class: "btn btn-sm btn-main add-country",
+                                "data-country": country.name,
+                            }).text("Add")
+                        )
+                        .appendTo(countryList);
+                });
+            } catch (error) {
+                $("#error_message").text("Error loading countries");
+            }
+        }
+    }
+
+    // Search functionality
+    $("#countrySearch").on("input", function () {
+        const searchTerm = $(this).val();
+        renderCountries(searchTerm);
+    });
+
+    // Add country to the selected list
+    function addCountry(name) {
+        // If this is the first time a value is added to that list
+        if (!blacklistsValues[currentModalFieldId])
+            blacklistsValues[currentModalFieldId] = [];
+
+        var currentList = blacklistsValues[currentModalFieldId];
+
+        // If the value already exists, don't change anything
+        if (!currentList.some((entry) => entry.value === name)) {
+            // If the value was removed before changes applied it will bring it back
+            const index = removeFromBlacklist.findIndex(
+                (obj) => obj.value === name
+            );
+
+            // If the value is new, it will be added to the list without id
+            if (index === -1) {
+                const newEntry = {
+                    value: name,
+                    field_id: currentModalFieldId,
+                };
+                addToBlacklist.push(newEntry);
+                currentList.push(newEntry);
+            } else {
+                const [RevivedEntry] = removeFromBlacklist.splice(index, 1);
+                currentList.push(RevivedEntry);
+            }
+
+            $("#countrySearch").val("");
+            renderCountries("");
+            renderSelectedCountries();
+        }
+    }
+
+    // Trigger the adding function
+    $(document).on("click", ".add-country", function () {
+        addCountry($(this).data("country"));
+    });
+
+    // Remove country from the selected list
+    function removeCountry(removedValue) {
+        var currentList = blacklistsValues[currentModalFieldId];
+
+        // Remove the entry from the current list
+        var index = currentList.findIndex((obj) => obj.value === removedValue);
+        const [removedObject] = currentList.splice(index, 1);
+
+        // Remove only objects that exists in the database
+        if (removedObject.hasOwnProperty("id")) {
+            removeFromBlacklist.push(removedObject);
+        }
+
+        // Remove the entry from added values if its a new value
+        index = addToBlacklist.findIndex((obj) => obj.value === removedValue);
+        if (index !== -1) addToBlacklist.splice(index, 1);
+
+        $("#countrySearch").val("");
+        renderCountries("");
+        renderSelectedCountries();
+    }
+
+    // Trigger the removing function
+    $(document).on("click", ".remove-country", function () {
+        removeCountry($(this).data("country"));
+    });
+
+    function renderSelectedCountries() {
+        const selectedList = $("#selectedCountries");
+        selectedList.empty();
+
+        var valuesInList = blacklistsValues[currentModalFieldId];
+
+        if (valuesInList) {
+            // Add counter of items
+            $("#list-counter-countries").text(`${valuesInList.length} items`);
+
+            valuesInList.forEach((entry) => {
+                const country = listOfCountries.find(
+                    (c) => c.name === entry.value
+                );
+                selectedList.append(
+                    $("<li/>", {
+                        class: "list-group-item d-flex justify-content-between align-items-center",
+                    })
+                        .append(
+                            $("<span/>").text(`${country.flag} ${country.name}`)
+                        )
+                        .append(
+                            $("<button/>", {
+                                class: "btn btn-sm btn-danger remove-country",
+                                "data-country": country.name,
+                            }).text("Remove")
+                        )
+                );
+            });
+        } else {
+            $("#list-counter-countries").text("0 items");
+        }
+
+        // Adapt the state of the apply changes button if there's a need to
+        if (addToBlacklist.length + removeFromBlacklist.length > 0)
+            totalChanges.add("Blacklist");
+        else totalChanges.delete("Blacklist");
+
+        if (totalChanges.size > 0) enableApplyChangesButton();
+        else disableApplyChangesButton();
+    }
+
     // Open list popup when the button is clicked
-    $(document).on("click", ".open-popup-btn", function () {
+    $(document).on("click", ".open-popup-btn", async function () {
         currentModalFieldId = $(this).data("field-id");
-        $("#blacklistFieldModal").modal("show");
-        renderBlacklist();
+
+        if (currentModalFieldId === countriesFieldId) {
+            $("#blacklistCountriesModal").modal("show");
+            await getCountries();
+            renderCountries();
+            renderSelectedCountries();
+        } else {
+            $("#blacklistFieldModal").modal("show");
+            renderBlacklist();
+        }
     });
 
     function loadPage() {
