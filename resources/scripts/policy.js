@@ -304,14 +304,13 @@ $(document).ready(function () {
 
     // Render the list inside the countries modal
     function renderCountries(searchTerm = "") {
-        console.log(searchTerm);
-        console.log(currentModalFieldId);
         const countryList = $("#countryList");
         countryList.empty();
         searchedCountries = [];
         if (searchTerm.length > 0) {
             try {
                 var currentList = blacklistsValues[currentModalFieldId];
+                console.log(currentList);
 
                 searchedCountries = listOfCountries
                     .filter((country) => {
@@ -342,6 +341,7 @@ $(document).ready(function () {
 
                         return 0; // Keep order if both or neither start with the search term
                     });
+                console.log(searchedCountries);
 
                 searchedCountries.forEach((country) => {
                     $("<li/>", {
