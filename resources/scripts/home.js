@@ -1,134 +1,74 @@
-$(document).ready(function () {
-    let graphCounter = 0;
+$(document).ready(function() {
+    const availableFields = ["field1", "field2", "field3", "field4", "field5"]; // Your actual fields here
+    const $filterFields = $("#filterFields");
+    const $groupByFields = $("#groupByFields");
 
-    $("body").append($("#graphConfigModal"));
+    $("body").append($("#chartModal"));
 
-    // Function to get possible fields (example)
-    function getFields() {
-        return {
-            sender: "str",
-            from_time: "datetime",
-            subject: "str",
-            // Add more fields as needed
-        };
-    }
-
-    // Function to fetch data based on filters (example)
-    function fetchData(filters) {
-        // Placeholder for AJAX call to fetch data
-        console.log("Fetching data with filters:", filters);
-        return []; // Replace with actual data
-    }
-
-    // Add filter field dynamically
-    $("#add-filter-btn").click(function () {
-        const fields = getFields();
-        const filterFieldHtml = `
-            <div class="form-group filter-group">
-                <label for="filter-field">Filter Field</label>
-                <select class="form-control filter-field">
-                    ${Object.keys(fields)
-                        .map(
-                            (field) =>
-                                `<option value="${field}">${field}</option>`
-                        )
-                        .join("")}
-                </select>
-                <input type="text" class="form-control filter-value" placeholder="Enter value">
-                <button type="button" class="btn btn-danger remove-filter-btn">Remove</button>
+    // Populate the filter and group-by fields with checkboxes
+    availableFields.forEach(field => {
+        // Add checkboxes for filtering
+        $filterFields.append(`
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="${field}" id="filter-${field}">
+                <label class="form-check-label" for="filter-${field}">${field}</label>
             </div>
-        `;
-        $("#filter-fields").append(filterFieldHtml);
+        `);
+
+        // Add checkboxes for grouping
+        $groupByFields.append(`
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="${field}" id="group-${field}">
+                <label class="form-check-label" for="group-${field}">${field}</label>
+            </div>
+        `);
     });
 
-    // Remove filter field
-    $(document).on("click", ".remove-filter-btn", function () {
-        $(this).closest(".filter-group").remove();
-    });
+    // Handle form submission
+    $("#chartForm").on("submit", function(e) {
+        e.preventDefault();
 
-    // Add a new graph
-    $("#add-graph-btn").click(function () {
-        $("#graph-config-form")[0].reset();
-        $("#graphConfigModal").modal("show");
-    });
-
-    // Save the configured graph
-    $("#save-graph-btn").click(function () {
-        const graphType = $("#graph-type").val();
-        const groupBy = $("#group-by").val();
-        const filters = {};
-
-        // Collect filter values
-        $(".filter-group").each(function () {
-            const field = $(this).find(".filter-field").val();
-            const value = $(this).find(".filter-value").val();
-            if (field && value) {
-                filters[field] = value;
-            }
+        // Collect selected filter fields
+        const filters = [];
+        $("#filterFields input:checked").each(function() {
+            filters.push($(this).val());
         });
 
-        // Add group_by to filters if provided
-        if (groupBy) {
-            filters.group_by = [groupBy];
+        // Collect selected group-by fields
+        const groupBy = [];
+        $("#groupByFields input:checked").each(function() {
+            groupBy.push($(this).val());
+        });
+
+        const chartType = $("input[name='chartType']:checked").val();
+
+        // Ensure at least one group-by field is selected
+        if (groupBy.length === 0) {
+            alert("Please select at least one field to group by.");
+            return;
         }
 
-        // Fetch data based on filters
-        const data = fetchData(filters);
-
-        // Generate graph container
-        const graphHtml = `
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <button type="button" class="close remove-graph-btn" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        Graph ${++graphCounter}
-                    </div>
-                    <div class="card-body">
-                        <canvas id="graph-${graphCounter}"></canvas>
-                    </div>
-                </div>
-            </div>
-        `;
-        $("#graphs-container").append(graphHtml);
-
-        // Render the chart
-        const ctx = document
-            .getElementById(`graph-${graphCounter}`)
-            .getContext("2d");
-        new Chart(ctx, {
-            type: graphType,
-            data: {
-                // Placeholder data structure
-                labels: [], // Add labels based on data
-                datasets: [
-                    {
-                        label: `Graph ${graphCounter}`,
-                        data: [], // Add data based on data
-                        backgroundColor: "rgba(0, 123, 255, 0.5)",
-                        borderColor: "rgba(0, 123, 255, 1)",
-                        borderWidth: 1,
-                    },
-                ],
+        // Send AJAX request with filters and group-by data
+        $.ajax({
+            url: "/charts/create",
+            method: "POST",
+            data: JSON.stringify({ filters, groupBy, chartType }),
+            contentType: "application/json",
+            success: function(response) {
+                renderChart(response.data, chartType);
+                saveChartId(response.id);
             },
-            options: {
-                scales: {
-                    x: {
-                        type: groupBy === "from_time" ? "time" : "category",
-                        time: {
-                            unit: "day",
-                        },
-                    },
-                },
-            },
+            error: function(xhr) {
+                alert("Error creating chart: " + xhr.responseText);
+            }
         });
-
-        $("#graphConfigModal").modal("hide");
     });
 
-    // Remove a graph
-    $(document).on("click", ".remove-graph-btn", function () {
-        $(this).closest(".col-md-6").remove();
-    });
+    function renderChart(data, chartType) {
+        // Implement chart rendering here
+    }
+
+    function saveChartId(chartId) {
+        // Implement chart ID saving here
+    }
 });

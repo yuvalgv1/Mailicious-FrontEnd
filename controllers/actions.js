@@ -168,7 +168,7 @@ async function addToBlacklist(req, res) {
     const token = req.cookies.access_token;
     try {
         const response = await fetch(
-            `${process.env.BACKEND_URL}/blacklist/add`,
+            `${process.env.BACKEND_URL}/blacklist/add/multi`,
             {
                 method: "POST",
                 headers: {
@@ -191,7 +191,7 @@ async function removeFromBlacklist(req, res) {
     const token = req.cookies.access_token;
     try {
         const response = await fetch(
-            `${process.env.BACKEND_URL}/blacklist/delete`,
+            `${process.env.BACKEND_URL}/blacklist/delete/multi`,
             {
                 method: "POST",
                 headers: {

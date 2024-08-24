@@ -27,7 +27,7 @@ $(document).ready(function () {
 
     // Add loading message when waiting for the server to send the data.
     function loadingAnimation() {
-        $("#loading-message")
+        $("#loading_message")
             .append(" Loading Data...")
             .append(
                 $("<span/>", {
@@ -39,7 +39,7 @@ $(document).ready(function () {
 
     // Remove the loading Data text
     function removeLoading() {
-        $("#loading-message").html("");
+        $("#loading_message").html("");
     }
 
     // Change state of the apply changes button.
@@ -636,7 +636,7 @@ $(document).ready(function () {
         // Mark checkbox and update state
         $(document).on("click", ".action-checkbox", function () {
             // Remove the success message
-            $("#success-message").text("");
+            $("#success_message").text("");
 
             currentActionID = parseInt($(this).data("action-id"));
             currentActionType = $(this).data("action-type");
@@ -720,7 +720,7 @@ $(document).ready(function () {
                     data: JSON.stringify(changedModules),
                     success: function (res) {
                         // Add a success message
-                        $("#success-message").text(
+                        $("#success_message").text(
                             "Policy updated successfully"
                         );
 
@@ -757,7 +757,7 @@ $(document).ready(function () {
                         actions = [...newActions];
 
                         // Add a success message
-                        $("#success-message").text(
+                        $("#success_message").text(
                             "Policy updated successfully"
                         );
 
@@ -788,7 +788,7 @@ $(document).ready(function () {
                         changed = true;
 
                         // Add a success message
-                        $("#success-message").text(
+                        $("#success_message").text(
                             "Policy updated successfully"
                         );
 
@@ -817,7 +817,7 @@ $(document).ready(function () {
                         changed = true;
 
                         // Add a success message
-                        $("#success-message").text(
+                        $("#success_message").text(
                             "Policy updated successfully"
                         );
 
@@ -868,7 +868,7 @@ $(document).ready(function () {
             });
 
         // Remove the success message
-        $("#success-message").text("");
+        $("#success_message").text("");
 
         if (changedModules.length > 0) totalChanges.add("Modules");
         else totalChanges.delete("Modules");

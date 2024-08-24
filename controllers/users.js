@@ -135,7 +135,7 @@ async function getUsers(req, res) {
 async function addUser(req, res) {
     try {
         const token = req.cookies.access_token;
-        const response = await fetch(`${process.env.BACKEND_URL}/users/add`, {
+        const response = await fetch(`${process.env.BACKEND_URL}/users`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -154,13 +154,11 @@ async function addUser(req, res) {
 async function deleteUser(req, res) {
     try {
         const token = req.cookies.access_token;
-        const response = await fetch(`${process.env.BACKEND_URL}/users/delete`, {
-            method: "POST",
+        const response = await fetch(`${process.env.BACKEND_URL}/users/delete/${req.body.id}`, {
+            method: "GET",
             headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(req.body)
         });
 
         const data = await response.json();

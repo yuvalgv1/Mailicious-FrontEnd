@@ -1,79 +1,92 @@
-<div class="container my-4">
-    <h1 class="text-center">Dynamic Graphs</h1>
-    <div id="graphs-container" class="row"></div>
-    <button id="add-graph-btn" class="btn btn-main mt-4">Add Graph</button>
+<link rel="stylesheet" href="/css/home.css" />
+
+<div id="top" class="container">
+    <div class="page-name h4">Dashboard</div>
+    <div id="error_message" class="text-danger-color"></div>
+    <div id="success_message" class="text-success-color"></div>
+    <div id="loading_message"></div>
 </div>
 
-<!-- Graph Configuration Modal -->
-<div
-    class="modal fade"
-    id="graphConfigModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="graphConfigModalLabel"
-    aria-hidden="true"
->
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="graphConfigModalLabel">
-                    Configure Graph
-                </h5>
-                <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                >
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Form for selecting fields, filters, graph type -->
-                <form id="graph-config-form">
-                    <div class="form-group">
-                        <label for="graph-type">Graph Type</label>
-                        <select class="form-control" id="graph-type">
-                            <option value="line">Line</option>
-                            <option value="bar">Bar</option>
-                            <!-- Add other graph types as needed -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="group-by">Group By</label>
-                        <input type="text" class="form-control" id="group-by" />
-                    </div>
-                    <div id="filter-fields">
-                        <!-- Dynamically add filter fields here -->
-                    </div>
+<div class="container">
+    <!-- Button to trigger modal -->
+    <button
+        type="button"
+        class="btn btn-main"
+        data-bs-toggle="modal"
+        data-bs-target="#chartModal"
+    >
+        Create Chart
+    </button>
+
+    <!-- Modal HTML -->
+    <div
+        class="modal fade"
+        id="chartModal"
+        tabindex="-1"
+        aria-labelledby="chartModalLabel"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chartModalLabel">
+                        Create Chart
+                    </h5>
                     <button
                         type="button"
-                        class="btn btn-secondary"
-                        id="add-filter-btn"
-                    >
-                        Add Filter
-                    </button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-dismiss="modal"
-                >
-                    Close
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    id="save-graph-btn"
-                >
-                    Save Graph
-                </button>
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+                </div>
+                <div class="modal-body">
+                    <form id="chartForm">
+                        <!-- Filter fields (optional) -->
+                        <div class="mb-3">
+                            <label class="form-label">Filter by Fields</label>
+                            <div id="filterFields"></div>
+                            <!-- Checkbox group for filters -->
+                        </div>
+
+                        <!-- Group by fields (required) -->
+                        <div class="mb-3">
+                            <label class="form-label">Group by Fields</label>
+                            <div id="groupByFields"></div>
+                            <!-- Checkbox group for grouping -->
+                        </div>
+
+                        <!-- Chart Type -->
+                        <div class="mb-3">
+                            <label class="form-label">Chart Type</label>
+                            <div>
+                                <input
+                                    type="radio"
+                                    id="chartBar"
+                                    name="chartType"
+                                    value="bar"
+                                    required
+                                />
+                                <label for="chartBar">Bar Chart</label>
+
+                                <input
+                                    type="radio"
+                                    id="chartPie"
+                                    name="chartType"
+                                    value="pie"
+                                    required
+                                />
+                                <label for="chartPie">Pie Chart</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Create Chart
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/scripts/home.js"></script>
+    <script src="/scripts/home.js"></script>
+</div>

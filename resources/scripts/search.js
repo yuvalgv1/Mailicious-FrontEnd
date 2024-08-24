@@ -63,7 +63,7 @@ $(document).ready(function () {
 
     // Add loading message when waiting for the server to send the data.
     function loadData() {
-        $("#loading-message")
+        $("#loading_message")
             .append(" Loading Data...")
             .append(
                 $("<span/>", {
@@ -75,7 +75,7 @@ $(document).ready(function () {
 
     // Remoev the loading Data text
     function removeLoading() {
-        $("#loading-message").html("");
+        $("#loading_message").html("");
     }
 
     $("#search-input").keypress(function (event) {
