@@ -276,16 +276,6 @@ $(document).ready(function () {
         renderBlacklist(currentModalFieldId);
     });
 
-    // Convert flag code to emoji
-    function countryCodeToFlagEmoji(countryCode) {
-        return countryCode;
-        // const codePoints = countryCode
-        //     .toUpperCase()
-        //     .split("")
-        //     .map((char) => 127397 + char.charCodeAt()); // 'A' is offset by 127397 to become a regional indicator symbol
-        // return String.fromCodePoint(...codePoints);
-    }
-
     // Get the list of countries from an API
     function getCountries() {
         return new Promise((resolve, reject) => {
@@ -295,7 +285,7 @@ $(document).ready(function () {
                 success: function (res) {
                     listOfCountries = res.map((country) => ({
                         name: country.name.common,
-                        flag: countryCodeToFlagEmoji(country.flag),
+                        flag: country.flag,
                     }));
                     resolve();
                 },
@@ -397,7 +387,6 @@ $(document).ready(function () {
             if (index === -1) {
                 const newEntry = {
                     value: name,
-                    field_id: currentModalFieldId,
                 };
                 addToBlacklist.push(newEntry);
                 currentList.push(newEntry);
