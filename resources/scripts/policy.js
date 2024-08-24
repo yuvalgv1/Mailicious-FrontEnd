@@ -676,12 +676,9 @@ $(document).ready(function () {
             function blacklistExt() {
                 const $policyRow = $(`#policy-row-${blacklistID}`);
 
-                // Add a seperator line
-                $policyRow.append($("<hr/>", { class: "bg-white" }));
-
                 // Add title
                 $("<div/>", {
-                    class: "boldText bg-white",
+                    class: "boldText text-dark bg-white",
                     html: "Blacklists:",
                 }).appendTo($policyRow);
 
