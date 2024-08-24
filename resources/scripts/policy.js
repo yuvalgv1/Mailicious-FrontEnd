@@ -310,22 +310,27 @@ $(document).ready(function () {
         if (searchTerm.length > 0) {
             try {
                 var currentList = blacklistsValues[currentModalFieldId];
-                console.log(currentList);
 
                 searchedCountries = listOfCountries
                     .filter((country) => {
-                        const isInExclusionList = currentList.some(
-                            (excluded) =>
-                                excluded.value.toLowerCase() ===
-                                country.name.toLowerCase()
-                        );
+                        if (currentList) {
+                            const isInExclusionList = currentList.some(
+                                (excluded) =>
+                                    excluded.value.toLowerCase() ===
+                                    country.name.toLowerCase()
+                            );
 
-                        return (
-                            country.name
+                            return (
+                                country.name
+                                    .toLowerCase()
+                                    .includes(searchTerm.toLowerCase()) &&
+                                !isInExclusionList
+                            );
+                        } else {
+                            return country.name
                                 .toLowerCase()
-                                .includes(searchTerm.toLowerCase()) &&
-                            !isInExclusionList
-                        );
+                                .includes(searchTerm.toLowerCase());
+                        }
                     })
                     .sort((a, b) => {
                         const nameA = a.name.toLowerCase();
@@ -341,7 +346,6 @@ $(document).ready(function () {
 
                         return 0; // Keep order if both or neither start with the search term
                     });
-                console.log(searchedCountries);
 
                 searchedCountries.forEach((country) => {
                     $("<li/>", {
