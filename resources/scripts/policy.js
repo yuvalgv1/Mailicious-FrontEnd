@@ -482,6 +482,7 @@ $(document).ready(function () {
         if (currentModalFieldId === countriesFieldId) {
             $("#blacklistCountriesModal").modal("show");
             await getCountries();
+            console.log(listOfCountries);
             renderCountries();
             renderSelectedCountries();
         } else {
