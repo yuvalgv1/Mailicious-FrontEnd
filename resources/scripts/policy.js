@@ -484,6 +484,7 @@ $(document).ready(function () {
     // Open list popup when the button is clicked
     $(document).on("click", ".open-popup-btn", async function () {
         currentModalFieldId = $(this).data("field-id");
+        $(".form-control").val("");
 
         if (currentModalFieldId === countriesFieldId) {
             $("#blacklistCountriesModal").modal("show");
