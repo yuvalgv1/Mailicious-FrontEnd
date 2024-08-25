@@ -34,6 +34,10 @@ router.get("/blacklist/fields", actionsontroller.getBlacklistFields);
 router.get("/blacklist", actionsontroller.getBlacklists);
 router.post("/blacklist/add", actionsontroller.addToBlacklist);
 router.post("/blacklist/remove", actionsontroller.removeFromBlacklist);
+router.get("/search/group/meta", actionsontroller.getMetaData);
+router.get("/search/group/all", actionsontroller.getChartsData);
+router.post("/charts/create", actionsontroller.createChart);
+router.post("/charts/delete", actionsontroller.deleteChart);
 
 
 module.exports = router;

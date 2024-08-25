@@ -7,86 +7,60 @@
     <div id="loading_message"></div>
 </div>
 
-<div class="container">
-    <!-- Button to trigger modal -->
+<div class="container my-4">
+    <div id="charts-container" class="row"></div>
     <button
-        type="button"
-        class="btn btn-main"
+        id="add-chart-btn"
+        class="btn btn-main mt-4"
         data-bs-toggle="modal"
         data-bs-target="#chartModal"
     >
-        Create Chart
+        Add Chart
     </button>
+</div>
 
-    <!-- Modal HTML -->
-    <div
-        class="modal fade"
-        id="chartModal"
-        tabindex="-1"
-        aria-labelledby="chartModalLabel"
-        aria-hidden="true"
-    >
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="chartModalLabel">
-                        Create Chart
-                    </h5>
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                    ></button>
+<div
+    class="modal fade"
+    id="chartModal"
+    tabindex="-1"
+    aria-labelledby="chartModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-container d-flex flex-column me-auto">
+                    <h5 class="modal-title" id="chartModalLabel">Create Chart</h5>
+                    <small id="modal_error" class="modal-subtitle text-danger-color">
+                    </small>
                 </div>
-                <div class="modal-body">
-                    <form id="chartForm">
-                        <!-- Filter fields (optional) -->
-                        <div class="mb-3">
-                            <label class="form-label">Filter by Fields</label>
-                            <div id="filterFields"></div>
-                            <!-- Checkbox group for filters -->
-                        </div>
-
-                        <!-- Group by fields (required) -->
-                        <div class="mb-3">
-                            <label class="form-label">Group by Fields</label>
-                            <div id="groupByFields"></div>
-                            <!-- Checkbox group for grouping -->
-                        </div>
-
-                        <!-- Chart Type -->
-                        <div class="mb-3">
-                            <label class="form-label">Chart Type</label>
-                            <div>
-                                <input
-                                    type="radio"
-                                    id="chartBar"
-                                    name="chartType"
-                                    value="bar"
-                                    required
-                                />
-                                <label for="chartBar">Bar Chart</label>
-
-                                <input
-                                    type="radio"
-                                    id="chartPie"
-                                    name="chartType"
-                                    value="pie"
-                                    required
-                                />
-                                <label for="chartPie">Pie Chart</label>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">
-                            Create Chart
-                        </button>
-                    </form>
-                </div>
+                
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer d-flex justify-content-end">
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+                <button
+                    id="createChart"
+                    type="submit"
+                    class="btn btn-main"
+                >
+                    Create Chart
+                </button>
             </div>
         </div>
     </div>
-
-    <script src="/scripts/home.js"></script>
 </div>
+
+<script src="/scripts/home.js"></script>

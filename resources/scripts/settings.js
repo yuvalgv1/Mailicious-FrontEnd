@@ -102,6 +102,9 @@ function getUsers() {
         success: function (response) {
             $("#error_message").text("");
             users = response;
+            users.forEach((user) => {
+                delete user.is_active;
+            });
             setProperties();
             updateUsersTable();
         },

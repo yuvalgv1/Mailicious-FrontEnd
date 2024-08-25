@@ -306,7 +306,7 @@ $(document).ready(function () {
                         .append(
                             $("<button/>", {
                                 id: `apply-filter-${field}`,
-                                class: "btn btn-primary mt-2 apply-filter",
+                                class: "btn btn-main mt-2 apply-filter",
                             })
                                 .text("Apply Filter")
                                 .click(function () {
