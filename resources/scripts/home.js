@@ -2,6 +2,7 @@ let fields = {};
 let groupByField = null;
 let chartsData = [];
 let sendData = {};
+let filtersCount = 0;
 
 // Display fields names prettier
 function prettyDisplayFields(field) {
@@ -381,8 +382,6 @@ $(document).on("click", ".remove-chart-btn", function () {
 
 // Add filter to modal
 $(document).on("click", "#add-field-btn", function () {
-    let filtersCount = 0;
-
     filtersCount++;
     const fieldId = `field-${filtersCount}`;
 
@@ -397,7 +396,7 @@ $(document).on("click", "#add-field-btn", function () {
         "data-field-id": fieldId,
     }).appendTo(
         $("<div/>", {
-            class: "col-md-4",
+            class: "col-4",
         }).appendTo($filterContainer)
     );
 
@@ -411,31 +410,32 @@ $(document).on("click", "#add-field-btn", function () {
             .prop("selected", true)
     );
 
-    Object.keys(fields).map((field) =>
+    Object.keys(fields).forEach((field) => {
         $("<option/>", {
             value: field,
             text: prettyDisplayFields(field),
-        })
-    );
+        }).appendTo($select);
+    });
 
     $("<div/>", {
-        class: "col-md-4",
+        class: "col-6",
     })
         .append(
             $("<div/>", {
                 class: "input-container",
             })
         )
+        .appendTo($filterContainer);
+
+    $("<div/>", {
+        class: "col",
+    })
         .append(
-            $("<div/>", {
-                class: "col-md-2",
-            }).append(
-                $("<button/>", {
-                    class: "btn btn-danger filter-remove-btn",
-                    text: "-",
-                    "data-field-id": fieldId,
-                })
-            )
+            $("<button/>", {
+                class: "btn btn-danger filter-remove-btn",
+                text: "-",
+                "data-field-id": fieldId,
+            })
         )
         .appendTo($filterContainer);
 });
@@ -461,22 +461,23 @@ $(document).on("change", ".field-select", function () {
             })
         );
     } else if (fields[selectedField] === "bool") {
-        inputContainer
-            .append($("<select/>"), {
+        inputContainer.append(
+            $("<select/>", {
                 class: "form-select",
             })
-            .append(
-                $("<option/>", {
-                    value: true,
-                    text: "True",
-                })
-            )
-            .append(
-                $("<option/>", {
-                    value: false,
-                    text: "False",
-                })
-            );
+                .append(
+                    $("<option/>", {
+                        value: true,
+                        text: "True",
+                    })
+                )
+                .append(
+                    $("<option/>", {
+                        value: false,
+                        text: "False",
+                    })
+                )
+        );
     } else if (fields[selectedField] === "datetime") {
         inputContainer.append(
             $("<input/>", {
