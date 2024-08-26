@@ -305,6 +305,14 @@ $(document).ready(function () {
                         )
                         .append(
                             $("<button/>", {
+                                class: "btn btn-empty mt-2 clear-filter",
+                                text: "Clear Filter",
+                            }).click(function () {
+                                clearFilter(field);
+                            })
+                        )
+                        .append(
+                            $("<button/>", {
                                 id: `apply-filter-${field}`,
                                 class: "btn btn-main mt-2 apply-filter",
                             })
@@ -469,6 +477,14 @@ $(document).ready(function () {
                 .length ===
             $(`#${checklistID}-list li:visible .checkbox-column`).length;
         $(`#select-all-${checklistID}`).prop("checked", allChecked);
+    }
+
+    // Clear Filter
+    function clearFilter(field) {
+        $(`${field}-search`).val("");
+        $(`#${field}-list .checkbox-column:checked`).prop("checked", false);
+        updateVisibleEntries(field);
+        applyFilter(field);
     }
 
     // Filter values based on search input
