@@ -192,6 +192,16 @@ function populateCreationModal() {
             text: "You may choose filters:",
         })
     );
+    $filterRowsContainer = $("<div/>", {
+        id: "dynamic-container",
+    }).appendTo($filterSection);
+    $filterSection.append(
+        $("<button/>", {
+            id: "add-field-btn",
+            class: "btn btn-main",
+            text: "+",
+        })
+    );
 
     $modalBody.append($("<hr/>"));
 
@@ -263,6 +273,39 @@ $(document).on("click", "#createChart", function () {
     }
 
     // Collect all filters
+    let allFieldsValid = true;
+    document.querySelectorAll(".field-select").forEach((selectElement) => {
+        const fieldId = selectElement.getAttribute("data-field-id");
+        const selectedField = selectElement.value;
+
+        // Check if the dropdown is filled
+        if (!selectedField) {
+            allFieldsValid = false;
+            $("#modal_error").text(
+                "You left a didn't slected fields on all of the filters"
+            );
+            return;
+        }
+
+        const inputContainer = document.querySelector(
+            `#${fieldId} .input-container`
+        );
+        const inputElement = inputContainer.querySelector("input, select");
+
+        // Get input value and filter out empty inputs
+        let inputValue = inputElement ? inputElement.value : null;
+        if (inputValue !== null && inputValue.trim() !== "") {
+            // Add to sendData object
+            if (!sendData[selectedField]) {
+                sendData[selectedField] = [];
+            }
+            sendData[selectedField].push(inputValue);
+        }
+    });
+
+    if (!allFieldsValid) {
+        return;
+    }
 
     // Save the requested type
     const radios = document.querySelectorAll('input[name="chartType"]');
@@ -279,7 +322,7 @@ $(document).on("click", "#createChart", function () {
             $("#modal_error").text("");
 
             // Load the new chart
-            let chart = response
+            let chart = response;
             chartsData.push(chart);
             displayChart(chart);
 
@@ -334,6 +377,114 @@ $(document).on("click", ".remove-chart-btn", function () {
             removeLoading();
         },
     });
+});
+
+// Add filter to modal
+$(document).on("click", "#add-field-btn", function () {
+    let filtersCount = 0;
+
+    filtersCount++;
+    const fieldId = `field-${filtersCount}`;
+
+    // Add the new filter section
+    $filterContainer = $("<div/>", {
+        id: fieldId,
+        class: "row mb-3",
+    }).appendTo($("#dynamic-container"));
+
+    $select = $("<select/>", {
+        class: "form-select field-select",
+        "data-field-id": fieldId,
+    }).appendTo(
+        $("<div/>", {
+            class: "col-md-4",
+        }).appendTo($filterContainer)
+    );
+
+    // Add a placeholder for the field selector
+    $select.append(
+        $("<option/>", {
+            value: "",
+            text: "Select a field",
+        })
+            .prop("disabled", true)
+            .prop("selected", true)
+    );
+
+    Object.keys(fields).map((field) =>
+        $("<option/>", {
+            value: field,
+            text: prettyDisplayFields(field),
+        })
+    );
+
+    $("<div/>", {
+        class: "col-md-4",
+    })
+        .append(
+            $("<div/>", {
+                class: "input-container",
+            })
+        )
+        .append(
+            $("<div/>", {
+                class: "col-md-2",
+            }).append(
+                $("<button/>", {
+                    class: "btn btn-danger filter-remove-btn",
+                    text: "-",
+                    "data-field-id": fieldId,
+                })
+            )
+        )
+        .appendTo($filterContainer);
+});
+
+$(document).on("click", ".filter-remove-btn", function () {
+    $(`#${$(this).data("field-id")}`).remove();
+});
+
+$(document).on("change", ".field-select", function () {
+    const fieldId = $(this).data("field-id");
+    const selectedField = $(this).val();
+    const inputContainer = $(`#${fieldId} .input-container`);
+
+    inputContainer.empty();
+
+    // Add appropriate input based on the field type
+    if (fields[selectedField] === "str") {
+        inputContainer.append(
+            $("<input/>", {
+                type: "text",
+                class: "form-control",
+                placeholder: "Enter text",
+            })
+        );
+    } else if (fields[selectedField] === "bool") {
+        inputContainer
+            .append($("<select/>"), {
+                class: "form-select",
+            })
+            .append(
+                $("<option/>", {
+                    value: true,
+                    text: "True",
+                })
+            )
+            .append(
+                $("<option/>", {
+                    value: false,
+                    text: "False",
+                })
+            );
+    } else if (fields[selectedField] === "datetime") {
+        inputContainer.append(
+            $("<input/>", {
+                type: "datetime-local",
+                class: "form-control",
+            })
+        );
+    }
 });
 
 $(document).ready(function () {
