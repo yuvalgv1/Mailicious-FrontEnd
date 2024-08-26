@@ -17,7 +17,7 @@
     </div>
     <button
         id="customize-table"
-        class="btn help-button has-popup btn-main"
+        class="btn help-button has-popup btn-main btn-circle"
         title="Customize Table"
         data-popup-id="columns-popup"
     >
@@ -25,11 +25,19 @@
     </button>
     <button
         id="date-filter"
-        class="btn help-button has-popup btn-main"
+        class="btn help-button has-popup btn-main btn-circle"
         title="Select Range"
         data-popup-id="date-popup"
     >
         <i class="fa-solid fa-calendar"></i>
+    </button>
+    <button
+        id="clear-all-filters"
+        class="btn btn-danger text-dark-color help-button"
+        title="Clear All Filters"
+        hidden
+    >
+        Clear All Filters
     </button>
     <div id="columns-popup" class="popup">
         <div class="popup-header">

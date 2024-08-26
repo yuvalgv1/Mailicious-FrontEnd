@@ -198,6 +198,10 @@ $(document).ready(function () {
         $table = $("#emails_table");
         $table.empty();
 
+        // Show the clear filter button if there are filteres and hide if there aren't
+        if (filteredFields.size > 0) $("#clear-all-filters").prop("hidden", false);
+        else $("#clear-all-filters").prop("hidden", true);
+
         // Add headers for the table
         let $thead = $("<thead/>").appendTo($table);
         let $headerRow = $("<tr/>", {
@@ -309,6 +313,7 @@ $(document).ready(function () {
                                 text: "Clear Filter",
                             }).click(function () {
                                 clearFilter(field);
+                                searchData();
                             })
                         )
                         .append(
@@ -319,6 +324,7 @@ $(document).ready(function () {
                                 .text("Apply Filter")
                                 .click(function () {
                                     applyFilter(field);
+                                    searchData();
                                 })
                         )
                 )
@@ -557,6 +563,13 @@ $(document).ready(function () {
         $(this).parent().parent().hide();
     });
 
+    $("#clear-all-filters").click(function () {
+        filteredFields.forEach((field) => {
+            clearFilter(field);
+        })
+        searchData();
+    })
+
     // Hide popup when clicking outside of it
     $(document).mouseup(function (event) {
         if (!$(event.target).closest(".popup").length) {
@@ -645,7 +658,6 @@ $(document).ready(function () {
         else removeField(field);
 
         $(this).closest(".popup").hide();
-        searchData();
     }
 
     function modifyDateFilter(field, value) {
