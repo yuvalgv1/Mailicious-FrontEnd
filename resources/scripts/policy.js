@@ -393,6 +393,7 @@ $(document).ready(function () {
             if (index === -1) {
                 const newEntry = {
                     value: name,
+                    field_id: countriesFieldId
                 };
                 addToBlacklist.push(newEntry);
                 currentList.push(newEntry);
