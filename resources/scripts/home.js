@@ -77,6 +77,8 @@ function getCurrentCharts() {
 
 // Add a chart to the screen
 function displayChart(chart) {
+    chart["name"] = "Test";
+    chart["type"] = "bar";
     // Add the chart container first
     $("#charts-container").append(
         $("<div/>", {
