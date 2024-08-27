@@ -20,6 +20,7 @@ $(document).ready(function () {
     let currentModalFieldId = null;
     let listOfCountries = [];
     let searchedCountries = [];
+    let changed = false;
 
     const $modulesTable = $("#modules_table tbody");
     $("#blacklistFieldModal").appendTo($("body"));
@@ -153,6 +154,7 @@ $(document).ready(function () {
                 url: "/blacklist",
                 type: "GET",
                 success: function (res) {
+                    blacklistsValues = {}
                     res.forEach((value) => {
                         const { field_id, ...rest } = value;
                         if (!(field_id in blacklistsValues))
@@ -242,6 +244,8 @@ $(document).ready(function () {
                     const [RevivedEntry] = removeFromBlacklist.splice(index, 1);
                     currentList.push(RevivedEntry);
                 }
+
+                console.log(blacklistsValues);
 
                 renderBlacklist(currentModalFieldId);
             }
@@ -393,7 +397,7 @@ $(document).ready(function () {
             if (index === -1) {
                 const newEntry = {
                     value: name,
-                    field_id: countriesFieldId
+                    field_id: countriesFieldId,
                 };
                 addToBlacklist.push(newEntry);
                 currentList.push(newEntry);
@@ -777,8 +781,11 @@ $(document).ready(function () {
                     },
                 });
 
-            // Handle changes in blacklist module
-            let changed = false;
+            // Load the data for blacklists after the removal if there's anything to remove.
+            let loadDataAfterAdd = false;
+            if (removeFromBlacklist.length === 0)
+                loadDataAfterAdd = true;
+
             if (addToBlacklist.length > 0)
                 $.ajax({
                     url: "/blacklist/add",
@@ -787,7 +794,8 @@ $(document).ready(function () {
                     data: JSON.stringify(addToBlacklist),
                     success: function (res) {
                         // Load the changes locally to enable a continuation
-                        changed = true;
+                        if (loadDataAfterAdd)
+                            loadBlacklistValues();
 
                         // Add a success message
                         $("#success_message").text(
@@ -816,7 +824,7 @@ $(document).ready(function () {
                     data: JSON.stringify(removeFromBlacklist),
                     success: function (res) {
                         // Load the changes locally to enable a continuation
-                        changed = true;
+                        loadBlacklistValues();
 
                         // Add a success message
                         $("#success_message").text(
@@ -836,8 +844,6 @@ $(document).ready(function () {
                         }
                     },
                 });
-
-            if (changed) loadBlacklistValues();
 
             disableApplyChangesButton();
         });
