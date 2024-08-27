@@ -2,6 +2,7 @@ let fields = {};
 let groupByField = null;
 let chartsData = [];
 let sendData = {};
+let filtersCount = 0;
 
 // Display fields names prettier
 function prettyDisplayFields(field) {
@@ -111,12 +112,99 @@ function displayChart(chart) {
                     $("<div/>", {
                         id: `chartBody-${chart.id}`,
                         class: "card-body",
-                    })
+                    }).append(
+                        $("<canvas/>", {
+                            id: `chart-${chart.id}`,
+                        })
+                    )
                 )
         )
     );
 
     // Load the chart in the middle of the card
+    var chartData = chart["data"];
+    var listOfValues = chartData["count"];
+
+    // Get all the keys excluding "count"
+    let keys = Object.keys(chartData).filter((key) => key !== "count");
+
+    let combinedKeys = keys.join(":");
+    let chartGuide = "";
+    if (keys.length > 1) chartGuide = `Group By "${combinedKeys}"`;
+    else chartGuide = `Group By ${combinedKeys}`;
+
+    let dataKeys = [];
+
+    let length = chartData[keys[0]].length; // Assuming all non-count arrays have the same length
+    for (let i = 0; i < length; i++) {
+        let combined = keys.map((key) => chartData[key][i]).join(":");
+        dataKeys.push(combined);
+    }
+
+    const colors = [
+        "#FF0000", // Bright Red-Orange
+        "#33FF57", // Bright Green
+        "#5733FF", // Bright Blue-Violet
+        "#FF33F6", // Bright Pink
+        "#33FFF6", // Bright Aqua
+        "#F6FF33", // Bright Yellow
+        "#8B4513", // Brown
+        "#C0C0C0", // Silver
+        "#000000", // Black
+        "#FF3380", // Bright Magenta
+        "#3380FF", // Bright Blue
+        "#80FF33", // Lime Green
+        "#FF8333", // Orange
+        "#33A1FF", // Sky Blue
+        "#A1FF33", // Yellow-Green
+        "#FF33A1", // Hot Pink
+        "#33FF83", // Mint Green
+        "#F633FF", // Neon Purple
+        "#FF6A33", // Tangerine
+        "#FFD700", // Gold
+
+    ];
+    
+
+    var chartType = chart.type.toLowerCase()
+    var xValues = dataKeys;
+    var yValues = listOfValues;
+    var barColors = [...Array(dataKeys.length)].map((_, i) => colors[i % colors.length]);;
+    var isRounded = chartType === "pie" || chartType === "doughnut";
+
+    let chartOptions = {
+        legend: { display: isRounded },
+        title: {
+            display: true,
+            text: chartGuide,
+        },
+    };
+
+    if (chartType === "bar")
+        chartOptions["scales"] = {
+            yAxes: [
+                {
+                    ticks: {
+                        beginAtZero: true,
+                    },
+                },
+            ],
+        };
+
+    // Create the chart
+    new Chart(`chart-${chart.id}`, {
+        type: chartType,
+        data: {
+            labels: xValues,
+            datasets: [
+                {
+                    backgroundColor: barColors,
+                    data: yValues,
+                },
+            ],
+        },
+        options: chartOptions,
+    });
 }
 
 // Add content to the modal
@@ -244,6 +332,21 @@ function populateCreationModal() {
                 class: "me-3",
                 for: "chartPie",
                 text: "Pie Chart",
+            })
+        )
+        .append(
+            $("<input/>", {
+                type: "radio",
+                id: "chartDoughnut",
+                name: "chartType",
+                value: "doughnut",
+            }).prop("checked", true)
+        )
+        .append(
+            $("<label/>", {
+                class: "me-3",
+                for: "chartDoughnut",
+                text: "Doughnut Chart",
             })
         );
 }
@@ -381,8 +484,6 @@ $(document).on("click", ".remove-chart-btn", function () {
 
 // Add filter to modal
 $(document).on("click", "#add-field-btn", function () {
-    let filtersCount = 0;
-
     filtersCount++;
     const fieldId = `field-${filtersCount}`;
 
@@ -397,7 +498,7 @@ $(document).on("click", "#add-field-btn", function () {
         "data-field-id": fieldId,
     }).appendTo(
         $("<div/>", {
-            class: "col-md-4",
+            class: "col-4",
         }).appendTo($filterContainer)
     );
 
@@ -411,31 +512,32 @@ $(document).on("click", "#add-field-btn", function () {
             .prop("selected", true)
     );
 
-    Object.keys(fields).map((field) =>
+    Object.keys(fields).forEach((field) => {
         $("<option/>", {
             value: field,
             text: prettyDisplayFields(field),
-        })
-    );
+        }).appendTo($select);
+    });
 
     $("<div/>", {
-        class: "col-md-4",
+        class: "col-6",
     })
         .append(
             $("<div/>", {
                 class: "input-container",
             })
         )
+        .appendTo($filterContainer);
+
+    $("<div/>", {
+        class: "col",
+    })
         .append(
-            $("<div/>", {
-                class: "col-md-2",
-            }).append(
-                $("<button/>", {
-                    class: "btn btn-danger filter-remove-btn",
-                    text: "-",
-                    "data-field-id": fieldId,
-                })
-            )
+            $("<button/>", {
+                class: "btn btn-danger filter-remove-btn",
+                text: "-",
+                "data-field-id": fieldId,
+            })
         )
         .appendTo($filterContainer);
 });
@@ -461,22 +563,23 @@ $(document).on("change", ".field-select", function () {
             })
         );
     } else if (fields[selectedField] === "bool") {
-        inputContainer
-            .append($("<select/>"), {
+        inputContainer.append(
+            $("<select/>", {
                 class: "form-select",
             })
-            .append(
-                $("<option/>", {
-                    value: true,
-                    text: "True",
-                })
-            )
-            .append(
-                $("<option/>", {
-                    value: false,
-                    text: "False",
-                })
-            );
+                .append(
+                    $("<option/>", {
+                        value: true,
+                        text: "True",
+                    })
+                )
+                .append(
+                    $("<option/>", {
+                        value: false,
+                        text: "False",
+                    })
+                )
+        );
     } else if (fields[selectedField] === "datetime") {
         inputContainer.append(
             $("<input/>", {

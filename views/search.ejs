@@ -17,7 +17,7 @@
     </div>
     <button
         id="customize-table"
-        class="btn help-button has-popup btn-main"
+        class="btn help-button has-popup btn-main btn-circle"
         title="Customize Table"
         data-popup-id="columns-popup"
     >
@@ -25,11 +25,19 @@
     </button>
     <button
         id="date-filter"
-        class="btn help-button has-popup btn-main"
+        class="btn help-button has-popup btn-main btn-circle"
         title="Select Range"
         data-popup-id="date-popup"
     >
         <i class="fa-solid fa-calendar"></i>
+    </button>
+    <button
+        id="clear-all-filters"
+        class="btn btn-danger text-dark-color help-button"
+        title="Clear All Filters"
+        hidden
+    >
+        Clear All Filters
     </button>
     <div id="columns-popup" class="popup">
         <div class="popup-header">
@@ -78,7 +86,10 @@
                 <button id="apply-date-filter" class="btn btn-main mt-2">
                     Apply
                 </button>
-                <button id="clear-date-filter" class="btn btn-empty border mt-2">
+                <button
+                    id="clear-date-filter"
+                    class="btn btn-empty border mt-2"
+                >
                     Clear
                 </button>
             </div>
@@ -95,4 +106,78 @@
         ></table>
     </div>
     <script src="/scripts/search.js"></script>
+</div>
+
+<div
+    class="modal fade"
+    id="filterModal"
+    tabindex="-1"
+    aria-labelledby="filterModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-container d-flex flex-column me-auto">
+                    <h5 class="modal-title" id="chartModalLabel">Add Filter</h5>
+                    <small
+                        id="modal_error"
+                        class="modal-subtitle text-danger-color"
+                    >
+                    </small>
+                    <div id="loading_message"></div>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <input
+                    type="text"
+                    id="modal-search"
+                    class="form-control mb-2"
+                    placeholder="Search for values..."
+                />
+                <div class="form-check mb-2">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="select-all-modal"
+                    />
+                    <label class="form-check-label" for="select-all-modal"
+                        >Select All</label
+                    >
+                </div>
+                <ul id="modal-list" class="list-group"></ul>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <div>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Close
+                    </button>
+                </div>
+                <div>
+                    <button
+                        id="clear-filter"
+                        type="button"
+                        class="btn btn-empty"
+                        data-bs-dismiss="modal"
+                    >
+                        Clear Filter
+                    </button>
+                    <button id="add-filter" type="submit" class="btn btn-main">
+                        Add Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

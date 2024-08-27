@@ -6,18 +6,16 @@ function togglePopup(button, popup) {
             popup.css({
                 display: popup.is(":visible") ? "none" : "block",
             });
-            if (button.hasClass("help-button")) {
-                popup.css({
-                    left:
-                        button.offset().left -
-                        popup.outerWidth() -
-                        parseInt(
-                            getComputedStyle(
-                                document.documentElement
-                            ).getPropertyValue("--popup-distance")
-                        ), // Position to the left of the button
-                });
-            }
+            popup.css({
+                left:
+                    button.offset().left -
+                    popup.outerWidth() -
+                    parseInt(
+                        getComputedStyle(
+                            document.documentElement
+                        ).getPropertyValue("--popup-distance")
+                    ), // Position to the left of the button
+            });
         }
     }
 }
@@ -56,14 +54,19 @@ $(document).ready(function () {
     let subMapFields = {};
     let filteredFields = new Set();
     let valuesToFilter = {};
+    let currentFilterField = "";
+    let allValues = {};
 
     // Variables to track current sort field and order
     let currentSortField = null;
     let currentSortOrder = null;
 
+    // Put the modal on top
+    $("#filterModal").appendTo($("body"));
+
     // Add loading message when waiting for the server to send the data.
     function loadData() {
-        $("#loading_message")
+        $(".loading_message")
             .append(" Loading Data...")
             .append(
                 $("<span/>", {
@@ -75,13 +78,15 @@ $(document).ready(function () {
 
     // Remoev the loading Data text
     function removeLoading() {
-        $("#loading_message").html("");
+        $(".loading_message").html("");
     }
 
     $("#search-input").keypress(function (event) {
         if (event.which === 13) {
             if ($(this).val() != "") {
                 sendData["text"] = $(this).val();
+                $(this).val("");
+                $("#clear-all-filters").prop("hidden", false);
                 searchData();
             } else {
                 delete sendData["text"];
@@ -127,6 +132,28 @@ $(document).ready(function () {
         return valueParts.join(" ");
     }
 
+    // Get the list of all the fields that the server can process
+    function getFilterableFields() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/search/group/meta",
+                type: "GET",
+                success: function (res) {
+                    resolve(res.slice(1));
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                    reject(res);
+                },
+            });
+        });
+    }
+
     // Send to the server a request for a new query
     function searchData() {
         $("#emails_table").empty();
@@ -137,15 +164,24 @@ $(document).ready(function () {
             contentType: "application/json",
             data: JSON.stringify(sendData),
             success: function (response) {
+                // Close the modal
+                const modalElement = document.querySelector(".modal");
+                const modalInstance =
+                    bootstrap.Modal.getOrCreateInstance(modalElement);
+                modalInstance.hide();
+
                 $("#error_message").text("");
+                $("#modal_error").text("");
                 tableData = response;
                 if (fields.length === 0) setFields(tableData);
                 buildTable();
             },
             error: function (res) {
                 if (res.status == 401) window.location.href = "/login";
-                if (res.responseJSON && res.responseJSON.error)
+                if (res.responseJSON && res.responseJSON.error) {
                     $("#error_message").text(res.responseJSON.error);
+                    $("#modal_error").text(res.responseJSON.error);
+                }
                 removeLoading();
             },
         });
@@ -187,22 +223,33 @@ $(document).ready(function () {
         );
 
         // Create the list in the filters popups
-        visibleFields.forEach((field) => {});
+        fields.forEach((field) => {
+            allValues[field] = new Set();
+        });
 
         populateSortableList();
     }
 
     // Display the data
-    function buildTable() {
+    async function buildTable() {
         // Enter the data from the table
         $table = $("#emails_table");
         $table.empty();
+
+        // Show the clear filter button if there are filteres and hide if there aren't
+        if (filteredFields.size > 0 || sendData.hasOwnProperty("text"))
+            $("#clear-all-filters").prop("hidden", false);
+        else $("#clear-all-filters").prop("hidden", true);
 
         // Add headers for the table
         let $thead = $("<thead/>").appendTo($table);
         let $headerRow = $("<tr/>", {
             id: "table-head-row",
         }).appendTo($thead);
+
+        // Get the list of the
+        const filterableFields = await getFilterableFields();
+
 
         visibleFields.forEach((field) => {
             let $th = $("<th/>", {
@@ -224,97 +271,25 @@ $(document).ready(function () {
             }).appendTo($headerContent);
 
             // Add filter button
-
-            $("<button/>", {
-                id: `${field}-filter-button`,
-                type: "button",
-                class: "btn btn-sm filter-button header-button has-popup",
-                title: "Filter Column",
-                "data-popup-id": `${field}-popup`,
-            })
-                .append(
-                    $("<i/>", {
-                        class: "fa-solid fa-filter",
-                    })
-                )
-                .appendTo($headerButtons)
-                .click(function () {
-                    togglePopup($(this), $(`#${$(this).data("popup-id")}`));
-                });
-            if (filteredFields.has(field))
-                $(`#${field}-filter-button`).addClass("text-primary");
-
-            $("<div/>", {
-                id: `${field}-popup`,
-                class: "popup",
-            })
-                .append(
-                    $("<div/>", {
-                        class: "popup-header",
-                    })
-                        .append($("<span/>").text("Filter field:"))
-                        .append(
-                            $("<button/>", {
-                                class: "close-popup",
-                            })
-                                .html("&times;")
-                                .click(function () {
-                                    $(this).parent().parent().hide();
-                                })
-                        )
-                )
-                .append(
-                    $("<div/>", {
-                        class: "popup-content",
-                    })
-                        .append(
-                            $("<input/>", {
-                                type: "text",
-                                id: `${field}-search`,
-                                class: "form-control mb-2",
-                                placeholder: "Search for values...",
-                            }).on("input", function () {
-                                searchValuesInList(field);
-                            })
-                        )
-                        .append(
-                            $("<div/>", {
-                                class: "form-check mb-2",
-                            })
-                                .append(
-                                    $("<input/>", {
-                                        type: "checkbox",
-                                        class: "form-check-input",
-                                        id: `select-all-${field}`,
-                                    }).change(function () {
-                                        selectAllBoxChange(field);
-                                    })
-                                )
-                                .append(
-                                    $("<label/>", {
-                                        class: "form-check-label",
-                                        for: `select-all-${field}`,
-                                    }).text("Select All")
-                                )
-                        )
-                        .append(
-                            $("<ul/>", {
-                                id: `${field}-list`,
-                                class: "list-group",
-                            })
-                        )
-                        .append(
-                            $("<button/>", {
-                                id: `apply-filter-${field}`,
-                                class: "btn btn-main mt-2 apply-filter",
-                            })
-                                .text("Apply Filter")
-                                .click(function () {
-                                    applyFilter(field);
-                                })
-                        )
-                )
-                .appendTo($headerButtons);
+            if (filterableFields.includes(field)) {
+                $("<button/>", {
+                    id: `${field}-filter-button`,
+                    type: "button",
+                    class: "btn btn-sm filter-button header-button has-popup",
+                    title: "Filter Column",
+                    "data-bs-toggle": "modal",
+                    "data-bs-target": "#filterModal",
+                    "data-field": field,
+                })
+                    .append(
+                        $("<i/>", {
+                            class: "fa-solid fa-filter",
+                        })
+                    )
+                    .appendTo($headerButtons);
+                if (filteredFields.has(field))
+                    $(`#${field}-filter-button`).addClass("text-primary");
+            }
 
             // Add sorting button
             let $sortButton = $("<button/>", {
@@ -366,66 +341,36 @@ $(document).ready(function () {
             })
         );
 
-        let tempData = new Map();
-
         tableData.forEach((email) => {
             const $row = $("<tr>");
             visibleFields.forEach((field) => {
                 // Display data in the table
                 cellText = getFieldData(email, field);
 
-                if (field === "recipients" && email[field].length > 1)
+                if (field === "recipients" && email[field].length > 1) {
                     cellText = `${email[field][0]} and ${
                         email[field].length - 1
                     } more`;
-                else if (isDate(cellText)) {
+                } else if (isDate(cellText)) {
                     cellText = formatDateTime(new Date(cellText));
                 }
                 $row.append($("<td>").text(cellText));
 
-                // Temporarly create a set for every value in a field
-                if (!tempData[field]) tempData[field] = new Set();
-                if (field === "recipients") {
-                    email[field].forEach((recipient) => {
-                        tempData[field].add(recipient);
-                    });
-                } else tempData[field].add(cellText);
+                if (field === "recipients") allValues[field].add(email[field]);
+                else allValues[field].add(cellText);
             });
             $tableBody.append($row);
         });
-
-        // Using tempData, create the list in the filter popups
-        for (let fieldName in tempData) {
-            let fieldSet = tempData[fieldName];
-            fieldSet.forEach((value) => {
-                let listItem = $("<li/>")
-                    .addClass("list-group-item")
-                    .data("value", value)
-                    .append(
-                        $("<input>", {
-                            type: "checkbox",
-                            class: "checkbox-column",
-                        })
-                            .prop("checked", fieldSet.has(value))
-                            .change(function () {
-                                updateVisibleEntries(fieldName);
-                            })
-                    )
-                    .append($("<span>").text(value));
-                $(`#${fieldName}-list`).append(listItem);
-            });
-            updateSelectAllCheckbox(fieldName);
-        }
 
         // Remove the loading message
         removeLoading();
     }
 
     // Update visible fields based on checkbox states
-    function updateVisibleEntries(checklistID) {
-        if (checklistID === "columns") {
+    function updateVisibleEntries(type) {
+        if (type === "columns") {
             let newVisibleFields = [];
-            $(`#${checklistID}-list .checkbox-column`).each(function () {
+            $(`#${type}-list .checkbox-column`).each(function () {
                 let fieldName = $(this).closest("li").data("field");
                 if ($(this).is(":checked")) {
                     newVisibleFields.push(fieldName);
@@ -434,7 +379,7 @@ $(document).ready(function () {
             visibleFields = new Set(newVisibleFields);
         } else {
             let newVisibleValues = [];
-            $(`#${checklistID}-list .checkbox-column`).each(function () {
+            $(`#${type}-list .checkbox-column`).each(function () {
                 let value = $(this).closest("li").data("value");
                 if ($(this).is(":checked")) {
                     newVisibleValues.push(value);
@@ -443,39 +388,39 @@ $(document).ready(function () {
             if (newVisibleValues.length > 0) {
                 if (typeof newVisibleValues[0] === "boolean")
                     if (newVisibleValues.length === 1)
-                        valuesToFilter[checklistID] = newVisibleValues[0];
-                    else delete valuesToFilter[checklistID];
-                else valuesToFilter[checklistID] = newVisibleValues;
-            } else delete valuesToFilter[checklistID];
+                        valuesToFilter[currentFilterField] =
+                            newVisibleValues[0];
+                    else delete valuesToFilter[currentFilterField];
+                else valuesToFilter[currentFilterField] = newVisibleValues;
+            } else delete valuesToFilter[currentFilterField];
         }
 
-        updateSelectAllCheckbox(checklistID);
+        updateSelectAllCheckbox(type);
     }
 
     // Handle select all checkbox change
-    function selectAllBoxChange(checklistID) {
-        let isChecked = $(`#select-all-${checklistID}`).is(":checked");
-        $(`#${checklistID}-list li:visible .checkbox-column`).prop(
+    function selectAllBoxChange(type) {
+        let isChecked = $(`#select-all-${type}`).is(":checked");
+        $(`#${type}-list li:visible .checkbox-column`).prop(
             "checked",
             isChecked
         );
-        updateVisibleEntries(checklistID);
+        updateVisibleEntries(type);
     }
 
     // Update select all checkbox state
-    function updateSelectAllCheckbox(checklistID) {
+    function updateSelectAllCheckbox(type) {
         let allChecked =
-            $(`#${checklistID}-list li:visible .checkbox-column:checked`)
-                .length ===
-            $(`#${checklistID}-list li:visible .checkbox-column`).length;
-        $(`#select-all-${checklistID}`).prop("checked", allChecked);
+            $(`#${type}-list li:visible .checkbox-column:checked`).length ===
+            $(`#${type}-list li:visible .checkbox-column`).length;
+        $(`#select-all-${type}`).prop("checked", allChecked);
     }
 
     // Filter values based on search input
-    function searchValuesInList(checklistID) {
-        $searchInput = $(`#${checklistID}-search`);
+    function searchValuesInList(type) {
+        $searchInput = $(`#${type}-search`);
         let searchText = $searchInput.val().toLowerCase();
-        $(`#${checklistID}-list li`).each(function () {
+        $(`#${type}-list li`).each(function () {
             let fieldText = $(this).text().toLowerCase();
             if (fieldText.includes(searchText)) {
                 $(this).show();
@@ -483,18 +428,17 @@ $(document).ready(function () {
                 $(this).hide();
             }
         });
-        updateSelectAllCheckbox(checklistID);
+        updateSelectAllCheckbox(type);
     }
 
     // Populate sortable list with columns
     function populateSortableList() {
         let sortableList = $("#columns-list");
         sortableList.empty();
-        fields.forEach((field, index) => {
+        fields.forEach((field) => {
             let listItem = $("<li/>")
                 .addClass("list-group-item order-column-item")
-                .data("field", field)
-                .data("index", index) // Store original index as data attribute
+                .attr("data-field", field)
                 .append(
                     $("<input>", { type: "checkbox", class: "checkbox-column" })
                         .prop("checked", visibleFields.has(field))
@@ -507,24 +451,36 @@ $(document).ready(function () {
         });
     }
 
-    // Handle pressing on the select all button on the column order popup
-    $("#select-all-columns").change(function () {
-        selectAllBoxChange("columns");
-    });
-
     // Initialize sortable
     $("#columns-list").sortable({
         placeholder: "sortable-placeholder",
         update: function (event, ui) {
             // Reorder fields array based on new order
             let newOrder = $(this).sortable("toArray", {
-                attribute: "data-index",
+                attribute: "data-field",
             });
-            let newVisibleFields = new Set(
-                newOrder.map((index) => fields[index])
-            );
+
+            // Convert Set to an array to be able to map values by order
+            const fieldsArray = Array.from(visibleFields);
+
+            // Create a new set for visible fields, ensuring it respects the new order
+            let newVisibleFields = new Set();
+
+            newOrder.forEach((field) => {
+                // Find the corresponding field object in the array
+                let matchingField = fieldsArray.find((item) => item === field);
+                if (matchingField) {
+                    newVisibleFields.add(matchingField);
+                }
+            });
+
             visibleFields = newVisibleFields;
         },
+    });
+
+    // Handle pressing on the select all button on the column order popup
+    $("#select-all-columns").change(function () {
+        selectAllBoxChange("columns");
     });
 
     // Filter columns based on search input
@@ -553,6 +509,112 @@ $(document).ready(function () {
         $(this).closest(".popup").hide();
         buildTable();
     });
+
+    function modifyDateFilter(field, value) {
+        if (value) addField(field, value);
+        else removeField(field);
+    }
+
+    function applyDateFilter(button) {
+        button.closest(".popup").hide();
+        modifyDateFilter("from_time", $("#from-date").val());
+        modifyDateFilter("to_time", $("#to-date").val());
+        currentFilterField = searchData();
+    }
+
+    // Apply changes with the date range to table
+    $("#apply-date-filter").click(function () {
+        applyDateFilter($(this));
+    });
+
+    $("#clear-date-filter").click(function () {
+        $("#from-date").val("");
+        $("#to-date").val("");
+        applyDateFilter($(this));
+    });
+
+    // Helper function to check if a value is a valid Date
+    function isDate(value) {
+        // Regular expression for the ISO 8601 format (YYYY-MM-DDTHH:mm:ss.ssssss)
+        const iso8601Format = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+$/;
+        const anotherFormat = /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+$/;
+
+        // Check if the value matches the ISO 8601 format regex
+        if (iso8601Format.test(value) || anotherFormat.test(value)) {
+            // Check if the value is a valid date
+            const date = new Date(value);
+            return !isNaN(date.getTime());
+        }
+        return false;
+    }
+
+    $(document).on("click", ".filter-button", function () {
+        currentFilterField = $(this).data("field");
+        $list = $("#modal-list").empty();
+
+        allValues[currentFilterField].forEach((value) => {
+            $list.append(
+                $("<li/>", {
+                    class: "list-group-item",
+                    "data-value": value,
+                })
+                    .append(
+                        $("<input>", {
+                            type: "checkbox",
+                            class: "checkbox-column",
+                        })
+                            .prop("checked", true)
+                            .change(function () {
+                                updateVisibleEntries("modal");
+                            })
+                    )
+                    .append($("<span>").text(value))
+            );
+        });
+        updateSelectAllCheckbox("modal");
+    });
+
+    $(document).on("input", "#modal-search", function () {
+        searchValuesInList("modal");
+    });
+
+    $(document).on("change", "#select-all-modal", function () {
+        selectAllBoxChange("modal");
+    });
+
+    // Clear Filter
+    function clearFilter() {
+        if (
+            currentFilterField === "from_time" ||
+            currentFilterField === "to_time"
+        ) {
+            $("#from-date").val("");
+            $("#to-date").val("");
+        } else {
+            $("#modal-search").val("");
+            $(`#modal-list .checkbox-column:checked`).prop("checked", false);
+            updateVisibleEntries("modal");
+        }
+
+        applyFilter();
+    }
+
+    $(document).on("click", "#clear-filter", function () {
+        clearFilter();
+        searchData();
+    });
+
+    $(document).on("click", "#add-filter", function () {
+        applyFilter();
+        searchData();
+    });
+
+    // Event listener for apply filter button inside the filter
+    function applyFilter() {
+        const inputValue = valuesToFilter[currentFilterField];
+        if (inputValue) addField(currentFilterField, inputValue);
+        else removeField(currentFilterField);
+    }
 
     // Add or update a field by value
     function addField(field, value) {
@@ -621,54 +683,15 @@ $(document).ready(function () {
         }
     }
 
-    // Event listener for apply filter button inside each popup
-    function applyFilter(field) {
-        const inputValue = valuesToFilter[field];
-        $button = $(`#${field}-filter-button`);
-        if (inputValue) addField(field, inputValue);
-        else removeField(field);
-
-        $(this).closest(".popup").hide();
+    // Handle the clear all filters buttons
+    $("#clear-all-filters").click(function () {
+        delete sendData["text"];
+        filteredFields.forEach((field) => {
+            currentFilterField = field;
+            clearFilter();
+        });
         searchData();
-    }
-
-    function modifyDateFilter(field, value) {
-        if (value) addField(field, value);
-        else removeField(field);
-    }
-
-    function applyDateFilter(button) {
-        button.closest(".popup").hide();
-        modifyDateFilter("from_time", $("#from-date").val());
-        modifyDateFilter("to_time", $("#to-date").val());
-        searchData();
-    }
-
-    // Apply changes with the date range to table
-    $("#apply-date-filter").click(function () {
-        applyDateFilter($(this));
     });
-
-    $("#clear-date-filter").click(function () {
-        $("#from-date").val("");
-        $("#to-date").val("");
-        applyDateFilter($(this));
-    });
-
-    // Helper function to check if a value is a valid Date
-    function isDate(value) {
-        // Regular expression for the ISO 8601 format (YYYY-MM-DDTHH:mm:ss.ssssss)
-        const iso8601Format = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+$/;
-        const anotherFormat = /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+$/;
-
-        // Check if the value matches the ISO 8601 format regex
-        if (iso8601Format.test(value) || anotherFormat.test(value)) {
-            // Check if the value is a valid date
-            const date = new Date(value);
-            return !isNaN(date.getTime());
-        }
-        return false;
-    }
 
     // Function to sort the table
     function sortTable(field, order) {
