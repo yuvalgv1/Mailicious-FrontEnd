@@ -141,12 +141,35 @@ function displayChart(chart) {
         dataKeys.push(combined);
     }
 
+    const colors = [
+        "#FF0000", // Bright Red-Orange
+        "#33FF57", // Bright Green
+        "#5733FF", // Bright Blue-Violet
+        "#FF33F6", // Bright Pink
+        "#33FFF6", // Bright Aqua
+        "#F6FF33", // Bright Yellow
+        "#8B4513", // Brown
+        "#C0C0C0", // Silver
+        "#000000", // Black
+        "#FF3380", // Bright Magenta
+        "#3380FF", // Bright Blue
+        "#80FF33", // Lime Green
+        "#FF8333", // Orange
+        "#33A1FF", // Sky Blue
+        "#A1FF33", // Yellow-Green
+        "#FF33A1", // Hot Pink
+        "#33FF83", // Mint Green
+        "#F633FF", // Neon Purple
+        "#FF6A33", // Tangerine
+        "#FFD700", // Gold
+
+    ];
     
 
     var chartType = chart.type.toLowerCase()
     var xValues = dataKeys;
     var yValues = listOfValues;
-    var barColors = ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9"];
+    var barColors = [...Array(dataKeys.length)].map((_, i) => colors[i % colors.length]);;
     var isRounded = chartType === "pie" || chartType === "doughnut";
 
     let chartOptions = {
