@@ -222,12 +222,6 @@ $(document).ready(function () {
             [...visibleFields].filter((item) => fields.has(item))
         );
 
-        // Create the list in the filters popups
-        console.log("test");
-        fields.forEach((field) => {
-            allValues[field] = new Set();
-        });
-
         populateSortableList();
     }
 
@@ -341,6 +335,10 @@ $(document).ready(function () {
                 class: "table-group-divider",
             })
         );
+
+        fields.forEach((field) => {
+            allValues[field] = new Set();
+        });
 
         tableData.forEach((email) => {
             const $row = $("<tr>");
@@ -551,6 +549,7 @@ $(document).ready(function () {
 
     $(document).on("click", ".filter-button", function () {
         currentFilterField = $(this).data("field");
+        $("#modal-search").val("");
         $list = $("#modal-list").empty();
 
         allValues[currentFilterField].forEach((value) => {
