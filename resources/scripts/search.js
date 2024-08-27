@@ -132,6 +132,28 @@ $(document).ready(function () {
         return valueParts.join(" ");
     }
 
+    // Get the list of all the fields that the server can process
+    function getFilterableFields() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/search/group/meta",
+                type: "GET",
+                success: function (res) {
+                    resolve(res.slice(1));
+                },
+                error: function (res) {
+                    if (res.status == 401) {
+                        window.location.href = "/login";
+                    }
+                    if (res.responseJSON && res.responseJSON.error) {
+                        $("#error_message").text(res.responseJSON.error);
+                    }
+                    reject(res);
+                },
+            });
+        });
+    }
+
     // Send to the server a request for a new query
     function searchData() {
         $("#emails_table").empty();
@@ -209,7 +231,7 @@ $(document).ready(function () {
     }
 
     // Display the data
-    function buildTable() {
+    async function buildTable() {
         // Enter the data from the table
         $table = $("#emails_table");
         $table.empty();
@@ -224,6 +246,10 @@ $(document).ready(function () {
         let $headerRow = $("<tr/>", {
             id: "table-head-row",
         }).appendTo($thead);
+
+        // Get the list of the
+        const filterableFields = await getFilterableFields();
+
 
         visibleFields.forEach((field) => {
             let $th = $("<th/>", {
@@ -245,24 +271,25 @@ $(document).ready(function () {
             }).appendTo($headerContent);
 
             // Add filter button
-
-            $("<button/>", {
-                id: `${field}-filter-button`,
-                type: "button",
-                class: "btn btn-sm filter-button header-button has-popup",
-                title: "Filter Column",
-                "data-bs-toggle": "modal",
-                "data-bs-target": "#filterModal",
-                "data-field": field,
-            })
-                .append(
-                    $("<i/>", {
-                        class: "fa-solid fa-filter",
-                    })
-                )
-                .appendTo($headerButtons);
-            if (filteredFields.has(field))
-                $(`#${field}-filter-button`).addClass("text-primary");
+            if (filterableFields.includes(field)) {
+                $("<button/>", {
+                    id: `${field}-filter-button`,
+                    type: "button",
+                    class: "btn btn-sm filter-button header-button has-popup",
+                    title: "Filter Column",
+                    "data-bs-toggle": "modal",
+                    "data-bs-target": "#filterModal",
+                    "data-field": field,
+                })
+                    .append(
+                        $("<i/>", {
+                            class: "fa-solid fa-filter",
+                        })
+                    )
+                    .appendTo($headerButtons);
+                if (filteredFields.has(field))
+                    $(`#${field}-filter-button`).addClass("text-primary");
+            }
 
             // Add sorting button
             let $sortButton = $("<button/>", {
