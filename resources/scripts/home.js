@@ -77,6 +77,7 @@ function getCurrentCharts() {
 
 // Add a chart to the screen
 function displayChart(chart) {
+    console.log(chart);
     chart["name"] = "Test";
     chart["type"] = "bar";
     // Add the chart container first
@@ -440,10 +441,11 @@ $(document).on("click", "#createChart", function () {
             removeLoading();
         },
         error: function (res) {
-            console.log(res);
             if (res.status == 401) window.location.href = "/login";
             if (res.responseJSON && res.responseJSON.error)
                 $("#modal_error").text(res.responseJSON.error);
+            if (res.responseJSON)
+                $("#modal_error").text(res.statusText);
             removeLoading();
         },
     });
