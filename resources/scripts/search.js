@@ -223,6 +223,7 @@ $(document).ready(function () {
         );
 
         // Create the list in the filters popups
+        console.log("test");
         fields.forEach((field) => {
             allValues[field] = new Set();
         });
