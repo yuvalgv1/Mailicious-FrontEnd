@@ -112,12 +112,76 @@ function displayChart(chart) {
                     $("<div/>", {
                         id: `chartBody-${chart.id}`,
                         class: "card-body",
-                    })
+                    }).append(
+                        $("<canvas/>", {
+                            id: `chart-${chart.id}`,
+                        })
+                    )
                 )
         )
     );
 
     // Load the chart in the middle of the card
+    var chartData = chart["data"];
+    var listOfValues = chartData["count"];
+
+    // Get all the keys excluding "count"
+    let keys = Object.keys(chartData).filter((key) => key !== "count");
+
+    let combinedKeys = keys.join(":");
+    let chartGuide = "";
+    if (keys.length > 1) chartGuide = `Group By "${combinedKeys}"`;
+    else chartGuide = `Group By ${combinedKeys}`;
+
+    let dataKeys = [];
+
+    let length = chartData[keys[0]].length; // Assuming all non-count arrays have the same length
+    for (let i = 0; i < length; i++) {
+        let combined = keys.map((key) => chartData[key][i]).join(":");
+        dataKeys.push(combined);
+    }
+
+    
+
+    var chartType = chart.type.toLowerCase()
+    var xValues = dataKeys;
+    var yValues = listOfValues;
+    var barColors = ["#b91d47", "#00aba9", "#2b5797", "#e8c3b9"];
+    var isRounded = chartType === "pie" || chartType === "doughnut";
+
+    let chartOptions = {
+        legend: { display: isRounded },
+        title: {
+            display: true,
+            text: chartGuide,
+        },
+    };
+
+    if (chartType === "bar")
+        chartOptions["scales"] = {
+            yAxes: [
+                {
+                    ticks: {
+                        beginAtZero: true,
+                    },
+                },
+            ],
+        };
+
+    // Create the chart
+    new Chart(`chart-${chart.id}`, {
+        type: chartType,
+        data: {
+            labels: xValues,
+            datasets: [
+                {
+                    backgroundColor: barColors,
+                    data: yValues,
+                },
+            ],
+        },
+        options: chartOptions,
+    });
 }
 
 // Add content to the modal
@@ -245,6 +309,21 @@ function populateCreationModal() {
                 class: "me-3",
                 for: "chartPie",
                 text: "Pie Chart",
+            })
+        )
+        .append(
+            $("<input/>", {
+                type: "radio",
+                id: "chartDoughnut",
+                name: "chartType",
+                value: "doughnut",
+            }).prop("checked", true)
+        )
+        .append(
+            $("<label/>", {
+                class: "me-3",
+                for: "chartDoughnut",
+                text: "Doughnut Chart",
             })
         );
 }
