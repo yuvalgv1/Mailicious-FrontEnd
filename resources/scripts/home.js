@@ -342,7 +342,7 @@ function populateCreationModal() {
                 id: "chartDoughnut",
                 name: "chartType",
                 value: "doughnut",
-            }).prop("checked", true)
+            })
         )
         .append(
             $("<label/>", {
