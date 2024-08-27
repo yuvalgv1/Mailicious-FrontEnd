@@ -90,7 +90,7 @@ function displayChart(chart) {
             })
                 .append(
                     $("<div/>", {
-                        class: "card-header d-flex justify-content-between align-item-center",
+                        class: "card-header d-flex justify-content-between align-item-center bg-main-color",
                     })
                         .append(
                             $("<h5>", {
@@ -440,6 +440,7 @@ $(document).on("click", "#createChart", function () {
             removeLoading();
         },
         error: function (res) {
+            console.log(res);
             if (res.status == 401) window.location.href = "/login";
             if (res.responseJSON && res.responseJSON.error)
                 $("#modal_error").text(res.responseJSON.error);
