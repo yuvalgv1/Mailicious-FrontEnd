@@ -366,7 +366,6 @@ $(document).ready(function () {
                     newVisibleValues.push(value);
                 }
             });
-            console.log(newVisibleValues);
             if (newVisibleValues.length > 0) {
                 if (typeof newVisibleValues[0] === "boolean")
                     if (newVisibleValues.length === 1)
@@ -375,8 +374,6 @@ $(document).ready(function () {
                     else delete valuesToFilter[currentFilterField];
                 else valuesToFilter[currentFilterField] = newVisibleValues;
             } else delete valuesToFilter[currentFilterField];
-            console.log(currentFilterField);
-            console.log(valuesToFilter);
         }
 
         updateSelectAllCheckbox(type);
@@ -597,6 +594,7 @@ $(document).ready(function () {
     // Event listener for apply filter button inside the filter
     function applyFilter() {
         const inputValue = valuesToFilter[currentFilterField];
+        console.log(inputValue);
         if (inputValue) addField(currentFilterField, inputValue);
         else removeField(currentFilterField);
     }
