@@ -245,7 +245,7 @@ $(document).ready(function () {
         }).appendTo($thead);
 
         // Get the list of the
-        const filterableFields = await getFilterableFields();
+        //const filterableFields = await getFilterableFields();
 
         visibleFields.forEach((field) => {
             let $th = $("<th/>", {
@@ -267,25 +267,23 @@ $(document).ready(function () {
             }).appendTo($headerContent);
 
             // Add filter button
-            if (filterableFields.includes(field)) {
-                $("<button/>", {
-                    id: `${field}-filter-button`,
-                    type: "button",
-                    class: "btn btn-sm filter-button header-button has-popup",
-                    title: "Filter Column",
-                    "data-bs-toggle": "modal",
-                    "data-bs-target": "#filterModal",
-                    "data-field": field,
-                })
-                    .append(
-                        $("<i/>", {
-                            class: "fa-solid fa-filter",
-                        })
-                    )
-                    .appendTo($headerButtons);
-                if (filteredFields.has(field))
-                    $(`#${field}-filter-button`).addClass("text-primary");
-            }
+            $("<button/>", {
+                id: `${field}-filter-button`,
+                type: "button",
+                class: "btn btn-sm filter-button header-button has-popup",
+                title: "Filter Column",
+                "data-bs-toggle": "modal",
+                "data-bs-target": "#filterModal",
+                "data-field": field,
+            })
+                .append(
+                    $("<i/>", {
+                        class: "fa-solid fa-filter",
+                    })
+                )
+                .appendTo($headerButtons);
+            if (filteredFields.has(field))
+                $(`#${field}-filter-button`).addClass("text-primary");
 
             // Add sorting button
             let $sortButton = $("<button/>", {
