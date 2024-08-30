@@ -32,7 +32,9 @@ function formatDateTime(date) {
         " " +
         pad(date.getHours()) +
         ":" +
-        pad(date.getMinutes())
+        pad(date.getMinutes()) +
+        ":" +
+        pad(date.getSeconds())
     );
 }
 
@@ -535,7 +537,7 @@ $(document).ready(function () {
     // Helper function to check if a value is a valid Date
     function isDate(value) {
         // Regular expression for the ISO 8601 format (YYYY-MM-DDTHH:mm:ss.ssssss)
-        const iso8601Format = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+$/;
+        const iso8601Format = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/;
         const anotherFormat = /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+$/;
 
         // Check if the value matches the ISO 8601 format regex
