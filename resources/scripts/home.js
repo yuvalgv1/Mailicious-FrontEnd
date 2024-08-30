@@ -32,6 +32,8 @@ function getMetaData() {
                         fields[key] = "bool";
                     } else if (key.includes("time")) {
                         fields[key] = "datetime";
+                    } else if (key == "id") {
+                        fields[key] = "number";
                     } else {
                         fields[key] = "str";
                     }
@@ -162,14 +164,14 @@ function displayChart(chart) {
         "#F633FF", // Neon Purple
         "#FF6A33", // Tangerine
         "#FFD700", // Gold
-
     ];
-    
 
-    var chartType = chart.type.toLowerCase()
+    var chartType = chart.type.toLowerCase();
     var xValues = dataKeys;
     var yValues = listOfValues;
-    var barColors = [...Array(dataKeys.length)].map((_, i) => colors[i % colors.length]);;
+    var barColors = [...Array(dataKeys.length)].map(
+        (_, i) => colors[i % colors.length]
+    );
     var isRounded = chartType === "pie" || chartType === "doughnut";
 
     let chartOptions = {
@@ -441,8 +443,7 @@ $(document).on("click", "#createChart", function () {
             if (res.status == 401) window.location.href = "/login";
             if (res.responseJSON && res.responseJSON.error)
                 $("#modal_error").text(res.responseJSON.error);
-            if (res.responseJSON)
-                $("#modal_error").text(res.statusText);
+            if (res.responseJSON) $("#modal_error").text(res.statusText);
             removeLoading();
         },
     });
@@ -564,7 +565,15 @@ $(document).on("change", ".field-select", function () {
                 placeholder: "Enter text",
             })
         );
-    } else if (fields[selectedField] === "bool") {
+    } else if (fields[selectedField] === "number") {
+        inputContainer.append(
+            $("<input/>", {
+                type: "number",
+                class: "form-control",
+            })
+        );
+    }
+    else if (fields[selectedField] === "bool") {
         inputContainer.append(
             $("<select/>", {
                 class: "form-select",
