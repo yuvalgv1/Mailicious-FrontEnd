@@ -404,7 +404,9 @@ $(document).on("click", "#createChart", function () {
             if (!sendData[selectedField]) {
                 sendData[selectedField] = [];
             }
-            sendData[selectedField].push(inputValue);
+            if (inputElement.attributes("type") === "number")
+                sendData[selectedField].push(parseInt(inputValue));
+            else sendData[selectedField].push(inputValue);
         }
     });
 
@@ -572,8 +574,7 @@ $(document).on("change", ".field-select", function () {
                 class: "form-control",
             })
         );
-    }
-    else if (fields[selectedField] === "bool") {
+    } else if (fields[selectedField] === "bool") {
         inputContainer.append(
             $("<select/>", {
                 class: "form-select",
