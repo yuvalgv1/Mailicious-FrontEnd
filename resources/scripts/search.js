@@ -375,6 +375,8 @@ $(document).ready(function () {
                     else delete valuesToFilter[currentFilterField];
                 else valuesToFilter[currentFilterField] = newVisibleValues;
             } else delete valuesToFilter[currentFilterField];
+            console.log(currentFilterField);
+            console.log(valuesToFilter);
         }
 
         updateSelectAllCheckbox(type);
