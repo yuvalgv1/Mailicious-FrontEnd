@@ -261,7 +261,7 @@ function populateCreationModal() {
         id: "groupByFields",
     }).appendTo($groupByFieldsSection);
     Object.entries(fields).forEach(([key, value]) => {
-        if (value !== "datetime") {
+        if (value !== "datetime" && key !== "id") {
             $groupByFieldsCheckboxes.append(
                 $("<div/>", {
                     class: "form-check",
