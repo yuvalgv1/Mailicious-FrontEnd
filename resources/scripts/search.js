@@ -242,7 +242,7 @@ $(document).ready(function () {
             }).appendTo($headerContent);
 
             // Add filter button
-            if (field !== "email_datetime" && !field.startsWith("analyses_"))
+            if (field !== "email_datetime" && !field.startsWith("analyses_") && field !== "attachments")
                 $("<button/>", {
                     id: `${field}-filter-button`,
                     type: "button",
