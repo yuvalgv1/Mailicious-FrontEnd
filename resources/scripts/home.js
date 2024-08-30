@@ -135,7 +135,6 @@ function displayChart(chart) {
     if (chartType === "bar")
         keys.forEach((key) => {
             if (Array.isArray(chartData[key])) {
-                console.log(chartData[key]);
                 chartData[key] = chartData[key].map((value) => {
                     // Check if the value is a string before slicing
                     return typeof value === "string" && value.length > 20

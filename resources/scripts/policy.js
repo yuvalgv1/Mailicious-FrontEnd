@@ -245,8 +245,6 @@ $(document).ready(function () {
                     currentList.push(RevivedEntry);
                 }
 
-                console.log(blacklistsValues);
-
                 renderBlacklist(currentModalFieldId);
             }
         }
