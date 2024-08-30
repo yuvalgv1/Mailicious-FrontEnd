@@ -124,11 +124,26 @@ function displayChart(chart) {
     );
 
     // Load the chart in the middle of the card
-    var chartData = chart["data"];
-    var listOfValues = chartData["count"];
+    var chartData = chart.data;
+    var listOfValues = chartData.count;
+    var chartType = chart.type.toLowerCase();
 
     // Get all the keys excluding "count"
     let keys = Object.keys(chartData).filter((key) => key !== "count");
+
+    // Function to truncate strings in arrays to 20 characters with "..."
+    if (chartType === "bar")
+        keys.forEach((key) => {
+            if (Array.isArray(chartData[key])) {
+                console.log(chartData[key]);
+                chartData[key] = chartData[key].map((value) => {
+                    // Check if the value is a string before slicing
+                    return typeof value === "string" && value.length > 20
+                        ? value.slice(0, 20) + "..."
+                        : value;
+                });
+            }
+        });
 
     let combinedKeys = keys.join(":");
     let chartGuide = "";
@@ -166,7 +181,6 @@ function displayChart(chart) {
         "#FFD700", // Gold
     ];
 
-    var chartType = chart.type.toLowerCase();
     var xValues = dataKeys;
     var yValues = listOfValues;
     var barColors = [...Array(dataKeys.length)].map(

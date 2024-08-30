@@ -364,7 +364,6 @@ $(document).ready(function () {
             });
             $tableBody.append($row);
         });
-        console.log(allValues["recipients"]);
 
         // Remove the loading message
         removeLoading();
