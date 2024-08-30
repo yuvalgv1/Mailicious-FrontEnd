@@ -267,6 +267,7 @@ $(document).ready(function () {
             }).appendTo($headerContent);
 
             // Add filter button
+            console.log(field);
             $("<button/>", {
                 id: `${field}-filter-button`,
                 type: "button",
