@@ -404,7 +404,7 @@ $(document).on("click", "#createChart", function () {
             if (!sendData[selectedField]) {
                 sendData[selectedField] = [];
             }
-            if (inputElement.attributes("type") === "number")
+            if (inputElement.attr("type") === "number")
                 sendData[selectedField].push(parseInt(inputValue));
             else sendData[selectedField].push(inputValue);
         }
