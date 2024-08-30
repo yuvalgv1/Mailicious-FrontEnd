@@ -594,8 +594,8 @@ $(document).ready(function () {
     // Event listener for apply filter button inside the filter
     function applyFilter() {
         const inputValue = valuesToFilter[currentFilterField];
-        console.log(inputValue);
-        if (inputValue) addField(currentFilterField, inputValue);
+        console.log(inputValue === false, inputValue === undefined);
+        if (inputValue !== undefined) addField(currentFilterField, inputValue);
         else removeField(currentFilterField);
     }
 
