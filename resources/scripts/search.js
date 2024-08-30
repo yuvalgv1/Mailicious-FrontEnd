@@ -247,7 +247,6 @@ $(document).ready(function () {
         // Get the list of the
         const filterableFields = await getFilterableFields();
 
-
         visibleFields.forEach((field) => {
             let $th = $("<th/>", {
                 scope: "col",
@@ -357,11 +356,15 @@ $(document).ready(function () {
                 }
                 $row.append($("<td>").text(cellText));
 
-                if (field === "recipients") allValues[field].add(email[field]);
-                else allValues[field].add(cellText);
+                if (field === "recipients") {
+                    email[field].forEach((recipient) => {
+                        allValues[field].add(recipient);
+                    });
+                } else allValues[field].add(cellText);
             });
             $tableBody.append($row);
         });
+        console.log(allValues["recipients"]);
 
         // Remove the loading message
         removeLoading();
