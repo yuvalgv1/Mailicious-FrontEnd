@@ -242,7 +242,11 @@ $(document).ready(function () {
             }).appendTo($headerContent);
 
             // Add filter button
-            if (field !== "email_datetime" && !field.startsWith("analyses_") && field !== "attachments")
+            if (
+                field !== "email_datetime" &&
+                !field.startsWith("analyses_") &&
+                field !== "attachments"
+            )
                 $("<button/>", {
                     id: `${field}-filter-button`,
                     type: "button",
@@ -362,6 +366,7 @@ $(document).ready(function () {
                     newVisibleValues.push(value);
                 }
             });
+            console.log(newVisibleValues);
             if (newVisibleValues.length > 0) {
                 if (typeof newVisibleValues[0] === "boolean")
                     if (newVisibleValues.length === 1)
