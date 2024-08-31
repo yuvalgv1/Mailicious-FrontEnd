@@ -3,6 +3,8 @@ let groupByField = null;
 let chartsData = [];
 let sendData = {};
 let filtersCount = 0;
+let previousValue = null;
+let oneFilterOption = ["bool", "datetime"];
 
 // Display fields names prettier
 function prettyDisplayFields(field) {
@@ -415,9 +417,13 @@ $(document).on("click", "#createChart", function () {
         if (inputValue !== null && inputValue.trim() !== "") {
             // Add to sendData object
             if (!sendData[selectedField]) {
+                if (oneFilterOption.includes(selectedField))
+                    sendData[selectedField] = "";
                 sendData[selectedField] = [];
             }
-            if (inputElement.type === "number")
+            if (oneFilterOption.includes(fields[selectedField]))
+                sendData[selectedField] = inputValue;
+            else if (inputElement.type === "number")
                 sendData[selectedField].push(parseInt(inputValue));
             else sendData[selectedField].push(inputValue);
         }
@@ -502,6 +508,7 @@ $(document).on("click", ".remove-chart-btn", function () {
 
 // Add filter to modal
 $(document).on("click", "#add-field-btn", function () {
+    // Add filter only if the field can accept more than one value
     filtersCount++;
     const fieldId = `field-${filtersCount}`;
 
@@ -531,10 +538,19 @@ $(document).on("click", "#add-field-btn", function () {
     );
 
     Object.keys(fields).forEach((field) => {
-        $("<option/>", {
+        $opt = $("<option/>", {
             value: field,
             text: prettyDisplayFields(field),
         }).appendTo($select);
+
+        // If there's already an option that can only have one value then disable the option
+        if (
+            oneFilterOption.includes(fields[field]) &&
+            $(".field-select").filter(function () {
+                return $(this).val() === field;
+            }).length > 0
+        )
+            $opt.attr("disabled", true);
     });
 
     $("<div/>", {
@@ -560,16 +576,46 @@ $(document).on("click", "#add-field-btn", function () {
         .appendTo($filterContainer);
 });
 
+// Renove a filter from the screen
 $(document).on("click", ".filter-remove-btn", function () {
     $(`#${$(this).data("field-id")}`).remove();
 });
 
+$(document).on("focus", ".field-select", function () {
+    previousValue = $(this).val();
+});
+
+// Handle a change in the field select
 $(document).on("change", ".field-select", function () {
     const fieldId = $(this).data("field-id");
     const selectedField = $(this).val();
     const inputContainer = $(`#${fieldId} .input-container`);
 
     inputContainer.empty();
+
+    // Remove disable options for a changed field
+    if (oneFilterOption.includes(fields[previousValue])) {
+        const anySingleFilterSelected =
+            $(".field-select").filter(function () {
+                return $(this).val() === previousValue;
+            }).length > 0;
+
+        if (!anySingleFilterSelected) {
+            $(".field-select")
+                .find(`option[value="${previousValue}"]`)
+                .attr("disabled", false);
+        }
+    }
+
+    // Disable the option to pick the current option if its a one option possible type of field
+    if (oneFilterOption.includes(fields[selectedField])) {
+        $(".field-select")
+            .not(`[data-field-id=${fieldId}]`)
+            .find(`option[value="${selectedField}"]`)
+            .attr("disabled", true);
+    }
+
+    previousValue = selectedField;
 
     // Add appropriate input based on the field type
     if (fields[selectedField] === "str") {
@@ -615,6 +661,7 @@ $(document).on("change", ".field-select", function () {
     }
 });
 
+// Execute the function once the page is loaded
 $(document).ready(function () {
     $("#chartModal").appendTo($("body"));
     loadingAnimation();
